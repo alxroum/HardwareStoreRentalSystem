@@ -1,5 +1,7 @@
 # Hardware Store Rental System
-Created By Alex Morris, Ahmed Nowayti, Alex Rouman, Alan Prudhomme, and Viren Viren.
-Tool rental software
+Created By Alex Morris, Ahmed Nowayti, Alex Rouman, Alan Prudhomme, and Faizah Fatima.
 
-Test
+## Dependencies ##
+- Node.js
+- React
+- SQL?
