@@ -17,7 +17,12 @@ nav {
   text-align: left;
 }
 
-
+#login-button {
+  background-color: rgb(237, 237, 237);
+  border: none;
+  aspect-ratio: 1/1;
+  border-radius: 5em;
+}
 
 
 
