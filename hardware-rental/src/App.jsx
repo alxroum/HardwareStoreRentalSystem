@@ -29,9 +29,13 @@ function App() {
 
       <nav>
         <h2>Hardware Rental</h2>
+        <button id="login-button">Login</button>
       </nav>
 
       <div id="content">
+
+
+        
         <div id="card_001" className="card">
           <div className='top-half'>
             <img className="item-image" src={circularSaw}></img>
