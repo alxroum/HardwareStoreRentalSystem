@@ -12,19 +12,32 @@
 
 nav {
   background-color: var(--theme-color);
-  padding: 2px;
-  padding-left: 20px;
   text-align: left;
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.nav-left {
+  grid-row: 0;
+}
+
+.nav-left h2 {
+  padding-left: 20px;
+}
+
+.nav-right {
+  grid-row: 0;
 }
 
 #login-button {
   background-color: rgb(237, 237, 237);
-  border: none;
+  display: flex;
+  margin-left: auto;
+  align-items: center;
+  width: fit-content;
   aspect-ratio: 1/1;
   border-radius: 5em;
 }
-
-
 
 #content {
   padding: 15px;
@@ -67,7 +80,7 @@ nav {
   font-weight: 700;
   font-size: large;
   text-align: left;
-  margin: 5px;
+  margin: 5px 0px;
 }
 
 .condition {
