@@ -28,8 +28,14 @@ function App() {
     <>
 
       <nav>
-        <h2>Hardware Rental</h2>
-        <button id="login-button">Login</button>
+        <div className='nav-left'>
+          <h2>Hardware Rental</h2>
+        </div>
+        
+        <div className='nav-right'>
+          <div id="login-button">Login</div>
+        </div>
+        
       </nav>
 
       <div id="content">
