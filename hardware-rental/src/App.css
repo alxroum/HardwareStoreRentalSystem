@@ -27,16 +27,17 @@ nav {
 
 .nav-right {
   grid-row: 0;
+  display: flex;
 }
 
 #login-button {
   background-color: rgb(237, 237, 237);
   display: flex;
-  margin-left: auto;
-  align-items: center;
-  width: fit-content;
   aspect-ratio: 1/1;
-  border-radius: 5em;
+  align-items: center;
+  justify-content: right;
+  position: relative;
+  text-align: center;
 }
 
 #content {
