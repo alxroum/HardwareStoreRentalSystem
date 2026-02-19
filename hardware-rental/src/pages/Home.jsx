@@ -1,0 +1,62 @@
+// graphics
+import circularSaw from '../assets/circular-saw.png'
+import powerWasher from '../assets/power-washer.png'
+
+import '../App.css'
+
+export function Home() {
+
+    return (
+
+        <div id="content">
+
+            <div id="card_001" className="card">
+            <div className='top-half'>
+                <img className="item-image" src={circularSaw}></img>
+            </div>
+            <div className='bottom-half'>
+                <div className="category">POWER TOOLS</div>
+                <div className="name">Circular Saw</div>
+                <div className="condition">Condition: Excellent</div>
+                <hr id="hr-01"></hr>
+                <div className="pricing-info">
+                <div className='left'>
+                    Daily rate:<br></br>
+                    Weekly rate:
+                </div>
+                <div className='right'>
+                    $25.00<br></br>
+                    $100.00
+                </div>
+                </div>
+                <button className="reserve-button">Reserve Now</button>
+                <button className="cart-button">Add to Cart</button>
+            </div>
+            </div>
+
+            <div id="card_001" className="card">
+            <div className='top-half'>
+                <img className="item-image" src={powerWasher}></img>
+            </div>
+            <div className='bottom-half'>
+                <div className="category">POWER TOOLS</div>
+                <div className="name">Power Washer</div>
+                <div className="condition">Condition: Good</div>
+                <hr id="hr-01"></hr>
+                <div className="pricing-info">
+                <div className='left'>
+                    Daily rate:<br></br>
+                    Weekly rate:
+                </div>
+                <div className='right'>
+                    $30.00<br></br>
+                    $110.00
+                </div>
+                </div>
+                <button className="reserve-button">Reserve Now</button>
+                <button className="cart-button">Add to Cart</button>
+            </div>
+            </div>
+        </div>
+    )
+}
