@@ -33,7 +33,9 @@ function App() {
         </div>
         
         <div className='nav-right'>
-          <div id="login-button">Login</div>
+          <div id="login-area">
+            <div id="login-button">Login</div>
+          </div>
         </div>
         
       </nav>
