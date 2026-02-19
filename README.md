@@ -15,3 +15,4 @@ Created By Alex Morris, Ahmed Nowayti, Alex Rouman, Alan Prudhomme, and Faizah F
 <br>index.html contains the bare-bones page layout and contains a 'root' element and a reference to the 'main.jsx' file.
 <br>index.css contains styling for index.html. This defines overall styling for the whole page and <br>doesn't generally contain specific styles for elements.
 <br>main.jsx binds the React app in 'App.jsx' to the 'root' element in the index.html file.
+<br> testing ahmed
