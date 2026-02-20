@@ -18,7 +18,33 @@ export function Home() {
         <div className='two-parts'>
 
             <div id='sidebar'>
-
+                <table id='sidebar-table'>
+                    
+                    <tr>
+                        <td><div className='category-selector'>All Categories</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Powertools</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Cleaning</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Access</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Masonry</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Yard & Garden</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Painting</div></td>
+                    </tr>
+                    <tr>
+                        <td><div className='category-selector'>Demolition</div></td>
+                    </tr>
+                </table>
             </div>
     
             <div id="item-grid">
