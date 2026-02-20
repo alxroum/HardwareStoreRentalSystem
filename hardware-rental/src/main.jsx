@@ -1,3 +1,5 @@
+// This is the main file that runs the whole program and calls the App function
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
