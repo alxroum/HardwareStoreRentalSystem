@@ -54,6 +54,8 @@ nav {
   display: grid;
   grid-template-columns: 20% 1fr;
   padding: 15px;
+  height: calc(100vh - 60px); /* subtract the nav height */
+  overflow: hidden;
 }
 
 #sidebar {
@@ -64,7 +66,8 @@ nav {
   box-shadow: 3px 3px rgb(218, 218, 218);
   color: black;
   margin-right: 10px;
-  height: fit-content;
+  height: fit-content; /* keep this so sidebar doesn't stretch */
+  align-self: start; /* prevents it from stretching to grid height */
 }
 
 #sidebar-table {
@@ -84,6 +87,8 @@ nav {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5em;
+  overflow-y: auto; /* makes ONLY the grid scroll */
+  align-content: start; /* keeps cards from stretching vertically */
 }
 
 .card {
