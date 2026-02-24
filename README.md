@@ -1,5 +1,5 @@
 # Hardware Store Rental System
-Created By Alex Morris, Ahmed Nowayti, Alex Rouman, Alan Prudhomme, and Faizah Fatima.
+Created By Alex Morris, Ahmed Nowayti, Alex Rouman, Alan Prudhomme, Faizah Fatima, and Nathan Gessner.
 
 ## Dependencies ##
 - Node.js
