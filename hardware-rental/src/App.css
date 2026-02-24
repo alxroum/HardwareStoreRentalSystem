@@ -8,6 +8,7 @@
   min-height: 100vh;
 
   --theme-color: orange;
+  --theme-accent: rgb(255, 153, 0);
 }
 
 nav {
@@ -19,6 +20,8 @@ nav {
 
 .nav-left {
   grid-row: 0;
+  display: flex;
+  align-items: center;
 }
 
 .nav-left h2 {
@@ -28,30 +31,64 @@ nav {
 .nav-right {
   grid-row: 0;
   display: flex;
+  align-items: center;
 }
 
 #login-area {
   aspect-ratio: 1/1;
   margin-left: auto;
   padding: 20px;
-  align-items: center;
   position: relative;
   text-align: center;
 }
 
 #login-button {
-  background-color: rgb(237, 237, 237);;
+  background-color: rgb(237, 237, 237);
   width: fit-content;
   aspect-ratio: 1/1;
   padding: 5px;
   border-radius: 5em;;
 }
 
-#content {
+.two-parts {
+  display: grid;
+  grid-template-columns: 20% 1fr;
+  padding: 15px;
+  height: calc(100vh - 60px); /* subtract the nav height */
+  overflow: hidden;
+}
+
+#sidebar {
+  margin: 15px 0;
+  padding: 1em;
+  background-color: white;
+  border-radius: 1em;
+  box-shadow: 3px 3px rgb(218, 218, 218);
+  color: black;
+  margin-right: 10px;
+  height: fit-content; /* keep this so sidebar doesn't stretch */
+  align-self: start; /* prevents it from stretching to grid height */
+}
+
+#sidebar-table {
+  width: 100%;
+}
+
+.category-selector {
+  padding: 20px;
+  background-color: rgb(237, 237, 237);
+  border-radius: 10px;
+  margin: 3px 0;
+  font-weight: 500;
+}
+
+#item-grid {
   padding: 15px;
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5em;
+  overflow-y: auto; /* makes ONLY the grid scroll */
+  align-content: start; /* keeps cards from stretching vertically */
 }
 
 .card {
@@ -137,4 +174,12 @@ nav {
 
 .cart-button {
   background-color: gray;
+}
+
+.reserve-button:hover {
+  background-color: var(--theme-accent);
+}
+
+.cart-button:hover {
+  background-color: rgb(106, 106, 106);
 }
