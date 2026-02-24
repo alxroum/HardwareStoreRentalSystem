@@ -30,6 +30,8 @@ function ToolCard({ id, image, category, name, condition, dailyRate, weeklyRate 
   )
 }
 
+export default ToolCard
+
 /*
 usage: 
 make sure to import where-ever
@@ -52,4 +54,3 @@ just call the func
   </div>
 */
 
-export default ToolCard
