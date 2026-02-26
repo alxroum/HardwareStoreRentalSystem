@@ -18,8 +18,8 @@ export function Card({category, name, condition, daily_rate, weekly_rate, image}
                         Weekly rate:
                     </div>
                     <div className='right'>
-                        ${daily_rate}<br></br>
-                        ${weekly_rate}
+                        ${daily_rate.toFixed(2)}<br></br>
+                        ${weekly_rate.toFixed(2)}
                     </div>
                 </div>
                 <button className="reserve-button">Reserve Now</button>
