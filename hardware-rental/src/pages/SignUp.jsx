@@ -19,8 +19,8 @@ export function SignUp() {
                     <div id="username-input"><input type="text"></input></div>
                     <p className="signup-label" id="password-label">Password:</p>
                     <div id="password-input"><input type="text"></input></div>
-                    <p className="signup-label" id="password-label">Confirm Password:</p>
-                    <div id="password-input"><input type="text"></input></div>
+                    <p className="signup-label" id="confirm-password-label">Confirm Password:</p>
+                    <div id="confirm-password-input"><input type="text"></input></div>
                     <div id="signup-button"><button>Create Account</button></div>
                 </div>
             </div>
