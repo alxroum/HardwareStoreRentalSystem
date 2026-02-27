@@ -6,7 +6,7 @@ import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
-import './App.css'
+import './styles/App.css'
 
 function Nav() {
   return (
@@ -20,9 +20,9 @@ function Nav() {
             <Link to="/admin" id="admin-button" style={{marginRight: '10px', cursor: 'pointer'}}>
                 Admin
             </Link>
-            <div id="login-button">
+            <Link to="/login" id="login-button" style={{marginRight: '10px', cursor: 'pointer'}}>
                 Login
-            </div>
+            </Link>
         </div>
         </div>
     </nav>
