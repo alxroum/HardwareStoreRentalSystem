@@ -70,8 +70,17 @@ nav {
   align-self: start; /* prevents it from stretching to grid height */
 }
 
-#sidebar-table {
+#sidebar-list {
   width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar-list li {
+  margin: 5px;
+  margin-top: 10px;
+  cursor: pointer;
 }
 
 .category-selector {
@@ -80,6 +89,14 @@ nav {
   border-radius: 10px;
   margin: 3px 0;
   font-weight: 500;
+}
+
+.category-selector:hover {
+  background-color: rgb(216, 216, 216);
+}
+
+.category-selector.active {
+  background-color: orange;
 }
 
 #item-grid {

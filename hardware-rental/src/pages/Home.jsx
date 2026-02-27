@@ -91,39 +91,26 @@ export function Home() {
         )
     }
 
+    const categoryButtons  = ["ALL", ...new Set(tools.map(t => t.category))];
+
     return (
         <>
         <div className='two-parts'>
 
             <div id='sidebar'>
-                <table id='sidebar-table'>
-                    <tbody>
-                        <tr>
-                            <td><div className='category-selector'>All Categories</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Powertools</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Cleaning</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Access</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Masonry</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Yard & Garden</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Painting</div></td>
-                        </tr>
-                        <tr>
-                            <td><div className='category-selector'>Demolition</div></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <ul id='sidebar-list'>
+                    
+                        {categoryButtons.map(cat => (
+                            <li key={cat}>
+                                <div
+                                    className={`category-selector ${category === cat ? "active" : ""}`} // conditional class
+                                    onClick={() => setCategory(cat)}
+                                >
+                                    {cat}
+                                </div>
+                            </li>
+                        ))}
+                </ul>
             </div>
     
             <div id="item-grid">
