@@ -1,0 +1,291 @@
+/* anims */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rowAppear {
+    from { opacity: 0; transform: translateX(-15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes popIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    70% { transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+    70% { box-shadow: 0 0 0 6px transparent; opacity: 0.7; }
+    100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+}
+
+/* page layout */
+.admin-page {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.admin-page h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 2.5rem;
+    letter-spacing: -0.5px;
+}
+
+.admin-section {
+    animation: slideDown 0.3s ease-out;
+}
+
+.admin-section h3,
+.add-item-form h3 {
+    color: #f0a500;
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* tab stuff */
+.admin-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.tab, .tab-active {
+    padding: 10px 25px;
+    border: 2px solid #f0a500;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.tab { background: white; color: #333; }
+
+.tab:hover {
+    background: #fff3d6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(240, 165, 0, 0.25);
+}
+
+.tab-active {
+    background: #f0a500;
+    color: white;
+    box-shadow: 0 4px 15px rgba(240, 165, 0, 0.35);
+    transform: translateY(-1px);
+}
+
+/* add item form styling */
+.add-item-form {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+    animation: popIn 0.4s ease-out;
+}
+
+.add-item-form:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.form-row input,
+.form-row select {
+    flex: 1;
+    padding: 12px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.form-row input:hover,
+.form-row select:hover {
+    border-color: #ccc;
+    background: white;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+    outline: none;
+    border-color: #f0a500;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.15);
+}
+
+.form-row input::placeholder { color: #aaa; }
+.form-row input:focus::placeholder { color: #ccc; }
+
+/* shared btn basee */
+.add-button, .edit-button, .save-button,
+.cancel-button, .remove-button {
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: all 0.25s ease;
+}
+
+.add-button:hover, .edit-button:hover, .save-button:hover,
+.cancel-button:hover, .remove-button:hover {
+    transform: translateY(-2px);
+}
+
+.add-button:active, .edit-button:active, .save-button:active,
+.cancel-button:active, .remove-button:active {
+    transform: translateY(0);
+}
+
+/* individual btns */
+.add-button {
+    background: #f0a500;
+    padding: 12px 35px;
+    border-radius: 8px;
+    font-size: 16px;
+    margin: 10px auto 0;
+    display: block;
+}
+
+.add-button:hover {
+    background: #d4920a;
+    box-shadow: 0 4px 15px rgba(240, 165, 0, 0.35);
+}
+
+.edit-button, .save-button,
+.cancel-button, .remove-button {
+    padding: 7px 16px;
+    font-size: 13px;
+    margin-right: 6px;
+}
+
+.edit-button { background: #f0a500; }
+.edit-button:hover { background: #d4920a; box-shadow: 0 3px 10px rgba(240, 165, 0, 0.3); }
+
+.save-button { background: #4caf50; }
+.save-button:hover { background: #3d8b40; box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3); }
+
+.cancel-button { background: #888; }
+.cancel-button:hover { background: #666; box-shadow: 0 3px 10px rgba(136, 136, 136, 0.3); }
+
+.remove-button { background: #e74c3c; }
+.remove-button:hover { background: #c0392b; box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3); }
+
+/* tabl */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-table thead {
+    background: linear-gradient(135deg, #f0a500, #e09200);
+    color: white;
+}
+
+.admin-table th {
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.admin-table tbody tr {
+    animation: rowAppear 0.3s ease-out backwards;
+    transition: all 0.25s ease;
+}
+
+/* row stagger delays */
+.admin-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.admin-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.admin-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.admin-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.admin-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+.admin-table tbody tr:nth-child(6) { animation-delay: 0.3s; }
+.admin-table tbody tr:nth-child(7) { animation-delay: 0.35s; }
+.admin-table tbody tr:nth-child(8) { animation-delay: 0.4s; }
+
+.admin-table tbody tr:nth-child(even) { background: #fcfcfc; }
+
+.admin-table tbody tr:hover {
+    background: #fff9eb;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(240, 165, 0, 0.12);
+}
+
+.admin-table td input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.admin-table td input:focus {
+    outline: none;
+    border-color: #f0a500;
+    box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.15);
+}
+
+/* the order status indicators in view orders */
+.status-active, .status-overdue, .status-returned {
+    font-weight: bold;
+    padding-left: 15px;
+    position: relative;
+}
+
+.status-active::before,
+.status-overdue::before,
+.status-returned::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-active { color: #4caf50; }
+.status-active::before { background: #4caf50; animation: pulse 2s infinite; }
+
+.status-overdue { color: #e74c3c; }
+.status-overdue::before { background: #e74c3c; animation: pulse 1.5s infinite; }
+
+.status-returned { color: #888; }
+.status-returned::before { background: #888; }

@@ -1,51 +1,54 @@
 // This file contains the code that is responsible for the home page.
 
 // graphics
+import { useEffect, useState } from 'react'
 import circularSaw from '../assets/circular-saw.png'
 import powerWasher from '../assets/power-washer.png'
 import paintSprayer from '../assets/paint-sprayer.png'
 import chainsaw from '../assets/chainsaw.png'
 
+/*
 const imageMap = {
     "Circular Saw": circularSaw,
     "Power Washer": powerWasher,
     "Paint Sprayer": paintSprayer,
     "Chainsaw": chainsaw
 }
+*/
 
-//database
-import { useEffect, useState } from 'react'
 
 // components
 import { Card } from '../components/Card'
 
-import '../App.css'
+// functions
+import { grabToolData } from '../App.jsx'
 
+// styles
+import '../styles/App.css'
 
-function categorize(category) {
-    switch(category) {
-        case "powertools":
-            break;
-        case "cleaning":
-            break;
-        case "access":
-            break;
-        case "masonry":
-            break;
-        case "yard-garden":
-            break;
-        case "painting":
-            break;
-        case "demolition":
-            break;
-        default:
-            break;
-
-    }
-}
-
-
+// home page function -> displays the cards with the data grabbed from the database
 export function Home() {
+
+const [category, setCategory] = useState("ALL");
+
+    const tools = grabToolData(); // call the grab function that sits in App.jsx
+    
+    function categorize() {
+        // only display cards that have the active category
+
+        const filteredTools =
+            category === "ALL"
+                ? tools // show all tools if category is 'ALL'
+                : tools.filter(tool => tool.category === category.toUpperCase()); // otherwise, filter by category
+
+        return (
+            filteredTools.map(tool => ( // map the data from a filtered list of tools into a card with each variable set
+                <Card key={tool.id} {...tool} />
+            ))
+        )
+    }
+
+    const categoryButtons  = ["ALL", ...new Set(tools.map(t => t.category))];
 
     const [inventory, setInventory] = useState([])
 
@@ -59,53 +62,31 @@ export function Home() {
         .catch(err => console.error("Error fetching inventory:", err))
 }, [])
 
-
     return (
         <>
         <div className='two-parts'>
 
             <div id='sidebar'>
-                <table id='sidebar-table'>
-                    <tbody>
-                    <tr>
-                        <td><div className='category-selector'>All Categories</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Powertools</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Cleaning</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Access</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Masonry</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Yard & Garden</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Painting</div></td>
-                    </tr>
-                    <tr>
-                        <td><div className='category-selector'>Demolition</div></td>
-                    </tr>
-                    </tbody>
-                </table>
+                <ul id='sidebar-list'>
+                    
+                        {categoryButtons.map(cat => (
+                            <li key={cat}>
+                                <div
+                                    className={`category-selector ${category === cat ? "active" : ""}`} // conditional class
+                                    onClick={() => setCategory(cat)}
+                                >
+                                    {cat}
+                                </div>
+                            </li>
+                        ))}
+                </ul>
             </div>
     
             <div id="item-grid">
-                {/* old harcoded code
-                 Cards are defined in the following way 
-                <Card category={"POWER TOOLS"} name={"Circular Saw"} condition={"Excellent"} daily_rate={25.00} weekly_rate={100.00} image={circularSaw}/>
-                <Card category={"CLEANING"} name={"Power Washer"} condition={"Good"} daily_rate={45.00} weekly_rate={180.00} image={powerWasher}/>
-                <Card category={"PAINTING"} name={"Paint Sprayer"} condition={"Okay"} daily_rate={35.00} weekly_rate={140.00} image={paintSprayer}/>
-                <Card category={"YARD AND GARDEN"} name={"Chainsaw"} condition={"Good"} daily_rate={30.00} weekly_rate={120.00} image={chainsaw}/>
-                <Card category={"YARD AND GARDEN"} name={"Chainsaw"} condition={"Good"} daily_rate={30.00} weekly_rate={120.00} image={chainsaw}/>
-                <Card category={"YARD AND GARDEN"} name={"Chainsaw"} condition={"Good"} daily_rate={30.00} weekly_rate={120.00} image={chainsaw}/>
-                */}
-                {inventory.map(item => (
+
+                {categorize() /* call categorize function */}
+                
+                {/*inventory.map(item => (
                     <Card
                         key={item.idinventory}
                         category={item.category}
@@ -115,7 +96,8 @@ export function Home() {
                         weekly_rate={item.weekly_rate}
                         image={imageMap[item.equipment_name]}
                     />
-                ))}
+                ))*/}
+                
 
             </div>
         </div>

@@ -70,8 +70,17 @@ nav {
   align-self: start; /* prevents it from stretching to grid height */
 }
 
-#sidebar-table {
+#sidebar-list {
   width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar-list li {
+  margin: 5px;
+  margin-top: 10px;
+  cursor: pointer;
 }
 
 .category-selector {
@@ -82,11 +91,22 @@ nav {
   font-weight: 500;
 }
 
+
 /*Alex Morris added this to get rid of the two scroll bars*/
 body {
   margin: 0;
   height: 100vh;
   overflow: hidden;
+}
+
+.category-selector:hover {
+  background-color: rgb(216, 216, 216);
+}
+
+.category-selector.active {
+  background-color: orange;
+  color: white;
+  font-weight: 700;
 }
 
 

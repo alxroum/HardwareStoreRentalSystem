@@ -1,11 +1,19 @@
 // This file contains the template code for each item card. Data is passed into the function and the card can be rendered on the page.
+import React from "react";
 
-export function Card({category, name, condition, daily_rate, weekly_rate, image}) {
-    
+export function Card({
+    category = "UNCATEGORIZED",
+    name = "Unnamed",
+    condition = "Unspecified",
+    daily_rate = 0,
+    weekly_rate = 0,
+    image = "power-auger.png"
+}) {
+
     return (
         <div id="card_001" className="card">
             <div className='top-half'>
-                <img className="item-image" src={image}></img>
+                <img className="item-image" src={`/assets/${image}`} alt={image}></img>
             </div>
             <div className='bottom-half'>
                 <div className="category">{category}</div>
@@ -18,8 +26,8 @@ export function Card({category, name, condition, daily_rate, weekly_rate, image}
                         Weekly rate:
                     </div>
                     <div className='right'>
-                        ${daily_rate}<br></br>
-                        ${weekly_rate}
+                        ${daily_rate.toFixed(2)}<br></br>
+                        ${weekly_rate.toFixed(2)}
                     </div>
                 </div>
                 <button className="reserve-button">Reserve Now</button>
