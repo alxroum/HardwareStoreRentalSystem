@@ -1,0 +1,20 @@
+When running code in terminal run it from the backend folder
+
+run "npm init -y"
+
+add "type": "module" to the newly created package.json
+as well as "start": "node App.js" to "scripts"
+
+in console run "npm i mysql2"
+
+add a .env file
+
+in the env file fill out your password
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_DATABASE=hardware_rental
+
+run "npm i dotenv"
+
+run "npm install express"
