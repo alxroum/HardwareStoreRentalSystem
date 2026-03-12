@@ -2,11 +2,12 @@
 
 // graphics
 import { useEffect, useState } from 'react'
+/*
 import circularSaw from '../assets/circular-saw.png'
 import powerWasher from '../assets/power-washer.png'
 import paintSprayer from '../assets/paint-sprayer.png'
 import chainsaw from '../assets/chainsaw.png'
-
+*/
 /*
 const imageMap = {
     "Circular Saw": circularSaw,
@@ -29,8 +30,19 @@ import '../styles/App.css'
 // home page function -> displays the cards with the data grabbed from the database
 export function Home() {
 
-const [category, setCategory] = useState("ALL");
-
+    const [category, setCategory] = useState("ALL");
+    /*
+    const [inventory, setInventory] = useState([])
+    useEffect(() => {
+    fetch("http://localhost:8080/inventory")
+        .then(res => res.json())
+        .then(data => {
+            console.log("INVENTORY FROM BACKEND:", data)   // 👈 ADDED
+            setInventory(data)
+        })
+        .catch(err => console.error("Error fetching inventory:", err))
+    }, [])
+    */
     const tools = grabToolData(); // call the grab function that sits in App.jsx
     
     function categorize() {
@@ -50,17 +62,9 @@ const [category, setCategory] = useState("ALL");
 
     const categoryButtons  = ["ALL", ...new Set(tools.map(t => t.category))];
 
-    const [inventory, setInventory] = useState([])
+    
 
-   useEffect(() => {
-    fetch("http://localhost:8080/inventory")
-        .then(res => res.json())
-        .then(data => {
-            console.log("INVENTORY FROM BACKEND:", data)   // 👈 ADDED
-            setInventory(data)
-        })
-        .catch(err => console.error("Error fetching inventory:", err))
-}, [])
+   
 
     return (
         <>
