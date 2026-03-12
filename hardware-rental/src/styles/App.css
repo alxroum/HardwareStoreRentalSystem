@@ -91,6 +91,14 @@ nav {
   font-weight: 500;
 }
 
+
+/*Alex Morris added this to get rid of the two scroll bars*/
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .category-selector:hover {
   background-color: rgb(216, 216, 216);
 }
@@ -101,12 +109,14 @@ nav {
   font-weight: 700;
 }
 
+
 #item-grid {
   padding: 15px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5em;
-  overflow-y: auto; /* makes ONLY the grid scroll */
+  height: 90vh;
+  overflow-y: auto; /* makes ONLY the grid scroll*/
   align-content: start; /* keeps cards from stretching vertically */
 }
 

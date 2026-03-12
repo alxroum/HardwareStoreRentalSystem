@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // pages
 import { Home } from './pages/Home'
@@ -22,12 +22,25 @@ import tool_data from './tool_data.json'
 // this function should ideally be moved to a dedicated database file with the read and write functions
 export function grabToolData() { // grabs the card and tool data from the database into the tools list
     // !! This function assumes that the incoming tool_data is in json format
-    const tools = []; // create list
-    tool_data.forEach(data => { // move data into tools
-      tools.push(data);
-    });
-    console.log(tools);
-    return tools;
+    //const tools = []; // create list
+    //tool_data.forEach(data => { // move data into tools
+    //  tools.push(data);
+    //});
+    //console.log(tools);
+    //return tools;
+
+    const [inventory, setInventory] = useState([])
+    useEffect(() => {
+    fetch("http://localhost:8080/inventory")
+        .then(res => res.json())
+        .then(data => {
+            console.log("INVENTORY FROM BACKEND:", data)   // 👈 ADDED
+            setInventory(data)
+        })
+        .catch(err => console.error("Error fetching inventory:", err))
+    }, [])
+    console.log(inventory);
+    return inventory;
 }
 
 function Nav() {
