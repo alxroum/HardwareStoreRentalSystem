@@ -97,6 +97,8 @@ nav {
 
 .category-selector.active {
   background-color: orange;
+  color: white;
+  font-weight: 700;
 }
 
 #item-grid {
