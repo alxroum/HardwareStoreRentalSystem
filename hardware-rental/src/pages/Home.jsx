@@ -31,18 +31,7 @@ import '../styles/App.css'
 export function Home() {
 
     const [category, setCategory] = useState("ALL");
-    /*
-    const [inventory, setInventory] = useState([])
-    useEffect(() => {
-    fetch("http://localhost:8080/inventory")
-        .then(res => res.json())
-        .then(data => {
-            console.log("INVENTORY FROM BACKEND:", data)   // 👈 ADDED
-            setInventory(data)
-        })
-        .catch(err => console.error("Error fetching inventory:", err))
-    }, [])
-    */
+    
     const tools = grabToolData(); // call the grab function that sits in App.jsx
     
     function categorize() {
@@ -62,9 +51,7 @@ export function Home() {
 
     const categoryButtons  = ["ALL", ...new Set(tools.map(t => t.category))];
 
-    
-
-   
+    const [expanded, setExpanded] = useState(false); // expanded is true if a card is clicked and a larger popup should appear
 
     return (
         <>
@@ -89,22 +76,14 @@ export function Home() {
             <div id="item-grid">
 
                 {categorize() /* call categorize function */}
-                
-                {/*inventory.map(item => (
-                    <Card
-                        key={item.idinventory}
-                        category={item.category}
-                        name={item.equipment_name}
-                        condition={item.quality}
-                        daily_rate={item.daily_rate}
-                        weekly_rate={item.weekly_rate}
-                        image={imageMap[item.equipment_name]}
-                    />
-                ))*/}
-                
 
             </div>
         </div>
+
+        {expanded && (
+            test
+        )}
+
         </>
     )
 }

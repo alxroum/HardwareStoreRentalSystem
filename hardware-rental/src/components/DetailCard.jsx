@@ -1,6 +1,5 @@
-// This file contains the template code for each item card. Data is passed into the function and the card can be rendered on the page.
+// This file contains the template code for the item details
 import React from "react";
-import { useId } from "react";
 
 export function Card({
     category = "UNCATEGORIZED",
@@ -11,10 +10,8 @@ export function Card({
     image_icon = "power-auger.png"
 }) {
 
-    const c_id = "card_" + useId(); // assign a unique id to be used as the card's id html parameter
-
     return (
-        <div id={c_id} className="card">
+        <div id="card_001" className="card">
             <div className='top-half'>
                 <img className="item-image" src={`/assets/${image_icon}`} alt={image_icon}></img>
             </div>
@@ -33,7 +30,7 @@ export function Card({
                         ${weekly_rate.toFixed(2)}
                     </div>
                 </div>
-                <button className="reserve-button">Reserve Now</button>
+                <button className="reserve-button">View Details</button>
                 <button className="cart-button">Add to Cart</button>
             </div>
         </div>

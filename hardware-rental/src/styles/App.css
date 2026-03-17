@@ -47,7 +47,12 @@ nav {
   width: fit-content;
   aspect-ratio: 1/1;
   padding: 5px;
-  border-radius: 5em;;
+  border-radius: 5em;
+}
+
+#login-button > *, #admin-button > * {
+  color: white;
+  font-weight: 700;
 }
 
 .two-parts {
@@ -90,7 +95,6 @@ nav {
   margin: 3px 0;
   font-weight: 500;
 }
-
 
 /*Alex Morris added this to get rid of the two scroll bars*/
 body {
@@ -211,4 +215,14 @@ body {
 
 .cart-button:hover {
   background-color: rgb(106, 106, 106);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
