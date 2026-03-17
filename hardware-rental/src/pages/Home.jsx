@@ -90,6 +90,7 @@ export function Home() {
                     <button className="close-btn" onClick={() => setSelectedTool(null)}>✕</button>
                     <img src={`/assets/${selectedTool.image_icon}`} alt={selectedTool.equipment_name} />
                     <h2>{selectedTool.equipment_name}</h2>
+                    <p>{selectedTool.equipment_description}</p>
                     <p>{selectedTool.category}</p>
                     <p>Condition: {selectedTool.quality}</p>
                     <p>Daily: ${selectedTool.daily_rate.toFixed(2)}</p>

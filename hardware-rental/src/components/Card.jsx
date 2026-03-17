@@ -5,6 +5,7 @@ import { useId } from "react";
 export function Card({
     category = "UNCATEGORIZED",
     equipment_name = "Unnamed",
+    equipment_description = "No description",
     quality = "Unspecified",
     daily_rate = 0,
     weekly_rate = 0,
