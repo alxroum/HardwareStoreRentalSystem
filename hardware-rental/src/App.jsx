@@ -34,7 +34,7 @@ export function grabToolData() { // grabs the card and tool data from the databa
         })
         .catch(err => console.error("Error fetching inventory:", err))
     }, [])
-    console.log(inventory);
+    //console.log(inventory);
     return inventory;
 }
 
