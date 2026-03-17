@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
+import { Cart } from './pages/Cart'
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -21,16 +22,10 @@ import tool_data from './tool_data.json'
 
 // this function should ideally be moved to a dedicated database file with the read and write functions
 export function grabToolData() { // grabs the card and tool data from the database into the tools list
-    // !! This function assumes that the incoming tool_data is in json format
-    //const tools = []; // create list
-    //tool_data.forEach(data => { // move data into tools
-    //  tools.push(data);
-    //});
-    //console.log(tools);
-    //return tools;
 
     const [inventory, setInventory] = useState([])
-    useEffect(() => {
+
+    useEffect(() => { // fetch the tool data from the database
     fetch("http://localhost:8080/inventory")
         .then(res => res.json())
         .then(data => {
@@ -52,12 +47,21 @@ function Nav() {
         
         <div className='nav-right'>
         <div id="login-area">
-            <Link to="/admin" id="admin-button" style={{marginRight: '10px', cursor: 'pointer'}}>
-                Admin
-            </Link>
-            <Link to="/login" id="login-button" style={{marginRight: '10px', cursor: 'pointer'}}>
-                Login
-            </Link>
+            <div id="admin-button">
+              <Link to="/admin" style={{marginRight: '10px', cursor: 'pointer'}}>
+                  Admin
+              </Link>
+            </div>
+            <div id="login-button">
+              <Link to="/login" style={{marginRight: '10px', cursor: 'pointer'}}>
+                  Login
+              </Link>
+            </div>
+            <div id="cart-button">
+              <Link to="/cart" style={{marginRight: '10px', cursor: 'pointer'}}>
+                  Cart
+              </Link>
+            </div>
         </div>
         </div>
     </nav>
@@ -69,11 +73,12 @@ function App() {
   return (
     <>
     <Router>
-      <Nav/>
+      <Nav/> {/* Display the navigation on all pages */}
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/admin' element={<Admin/>}/>
+        <Route path='/cart' element={<Cart/>}/>
       </Routes>
     </Router>
     </>
