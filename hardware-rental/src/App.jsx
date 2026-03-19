@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-// pages
+// pages (CSS issue is here, uses styling for last page imported, in this case it's SignUp.)
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
