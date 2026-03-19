@@ -5,6 +5,7 @@ import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
+import { SignUp } from './pages/SignUp'
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -79,10 +80,11 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/admin' element={<Admin/>}/>
         <Route path='/cart' element={<Cart/>}/>
+        <Route path='/signup' element={<SignUp/>}/>
       </Routes>
     </Router>
     </>
   )
-  
+
 }
 export default App

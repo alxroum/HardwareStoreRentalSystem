@@ -5,13 +5,6 @@ import './Login.css'
 export function Login() {
     return (
         <div id="root-element">
-            <div id="login-nav">
-            <nav>
-                <div className='nav-left'>
-                    <h2>Hardware Rental</h2>
-                </div>
-            </nav>
-            </div>
             <div id="login-box">
                 <h1>Login</h1>
                 <div id="login-input">

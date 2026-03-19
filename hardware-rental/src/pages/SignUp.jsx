@@ -5,13 +5,6 @@ import './SignUp.css'
 export function SignUp() {
     return (
         <div id="root-element">
-            <div id="signup-nav">
-            <nav>
-                <div className='nav-left'>
-                    <h2>Hardware Rental</h2>
-                </div>
-            </nav>
-            </div>
             <div id="signup-box">
                 <h1>Sign Up</h1>
                 <div id="signup-input">
