@@ -5,6 +5,7 @@ import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
+import { SignUp } from './pages/SignUp'
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -14,6 +15,7 @@ import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 // import chainsaw from './assets/chainsaw.png'
 // import jackhammer from './assets/jackhammer.png'
 // import powerAuger from './assets/power-auger.png'
+import cartIcon from '/assets/cart-icon.png'
 
 import './styles/App.css'
 
@@ -42,26 +44,29 @@ function Nav() {
   return (
     <nav>
         <div className='nav-left'>
-        <h2>Hardware Rental</h2>
+        <Link className="hidden-link" to="/" style={{cursor: 'pointer'}}>
+          <h2 id="nav-header">Hardware Rental</h2>
+        </Link>
         </div>
         
         <div className='nav-right'>
         <div id="login-area">
-            <div id="admin-button">
-              <Link to="/admin" style={{marginRight: '10px', cursor: 'pointer'}}>
+            <Link className="hidden-link" to="/admin" style={{cursor: 'pointer'}}>
+              <div id="admin-page-button">
                   Admin
-              </Link>
-            </div>
-            <div id="login-button">
-              <Link to="/login" style={{marginRight: '10px', cursor: 'pointer'}}>
+              </div>
+            </Link>
+            <Link className="hidden-link" to="/login" style={{cursor: 'pointer'}}>
+              <div id="login-page-button">
                   Login
-              </Link>
-            </div>
-            <div id="cart-button">
-              <Link to="/cart" style={{marginRight: '10px', cursor: 'pointer'}}>
+              </div>
+            </Link>
+            <Link className="hidden-link" to="/cart" style={{cursor: 'pointer'}}>
+              <div id="cart-page-button">
                   Cart
-              </Link>
-            </div>
+                  {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
+              </div>
+            </Link>
         </div>
         </div>
     </nav>
@@ -79,6 +84,7 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/admin' element={<Admin/>}/>
         <Route path='/cart' element={<Cart/>}/>
+        <Route path='/signUp' element={<SignUp/>}/>
       </Routes>
     </Router>
     </>

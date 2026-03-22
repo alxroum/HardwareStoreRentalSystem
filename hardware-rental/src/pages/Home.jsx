@@ -95,6 +95,12 @@ export function Home() {
                     <p>Condition: {selectedTool.quality}</p>
                     <p>Daily: ${selectedTool.daily_rate.toFixed(2)}</p>
                     <p>Weekly: ${selectedTool.weekly_rate.toFixed(2)}</p>
+                    <div className='left'>
+                        test
+                    </div>
+                    <div className='right'>
+                        test right
+                    </div>
                     <button className="reserve-button">Reserve Now</button>
                 </div>
             </div>

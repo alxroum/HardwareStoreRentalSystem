@@ -2,7 +2,8 @@
 
 body {
     justify-content: center;
-    background-color: #f0f0f0;
+    background-color: blue;
+    
 }
 
 .login-label {
@@ -16,6 +17,11 @@ body {
 
 .nav-left {
     width:500px;
+}
+
+#username-input > input, #password-input > input {
+    background-color: white;
+    border: 1px solid black;
 }
 
 #login-input { 
