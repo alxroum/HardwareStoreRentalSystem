@@ -18,6 +18,26 @@ export async function getInventory() {
     return rows;
 }
 
+export async function addInventoryItem({equipment_name, equipment_description, category, total_equipment, remaining_equipment,
+daily_rate, weekly_rate, image_icon = null, quality = "Okay"
+}) {
+    // query for db
+    const [result] = await pool.query(
+        `INSERT INTO inventory (equipment_name, equipment_description, category, total_equipment, remaining_equipment,
+         daily_rate, weekly_rate, image_icon, quality) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+            equipment_name, equipment_description, category, total_equipment, remaining_equipment, daily_rate,
+            weekly_rate, image_icon,quality
+        ]
+    )
+
+    const [rows] = await pool.query(
+        `SELECT * FROM inventory WHERE idinventory = ?`, [result.insertId]
+    )
+
+    return rows[0]
+}
+
 //test code
 //const inventory = await getInventory()
 //console.log(inventory)

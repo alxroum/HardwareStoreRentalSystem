@@ -1,27 +1,36 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
 import './Admin.css'
 
-// NOTE: THIS IS ALL TEMP TO REPRESENT BACKEND WHEN THE TIME COMES (FAKE DATA)
-// GOAL: CRUD (kinda)
-
-const sampleInventory = [
-    { id: 1, name: "Circular Saw", category: "Power Tools", description: "24V cordless circular saw", total: 5, remaining: 3, dailyRate: 25.00, weeklyRate: 100.00 },
-    { id: 2, name: "Power Washer", category: "Cleaning", description: "2000 PSI electric power washer", total: 3, remaining: 1, dailyRate: 30.00, weeklyRate: 110.00 },
-    { id: 3, name: "Paint Sprayer", category: "Painting", description: "Airless paint sprayer", total: 4, remaining: 4, dailyRate: 35.00, weeklyRate: 140.00 },
-    { id: 4, name: "Chainsaw", category: "Yard and Garden", description: "16 inch gas chainsaw", total: 6, remaining: 2, dailyRate: 30.00, weeklyRate: 120.00 },
-]
-
-const sampleOrders = [
-    { id: 1, userId: 1, username: "john_doe", item: "Circular Saw", dateRented: "2025-02-20", dateDue: "2025-02-27", status: "Active", totalCost: 100.00 },
-    { id: 2, userId: 2, username: "jane_smith", item: "Power Washer", dateRented: "2025-02-18", dateDue: "2025-02-25", status: "Overdue", totalCost: 110.00 },
-    { id: 3, userId: 3, username: "bob_jones", item: "Chainsaw", dateRented: "2025-02-10", dateDue: "2025-02-17", status: "Returned", totalCost: 120.00 },
-]
+// crud: create and read done. Need to do update and delete
+// need to also update fields to consider image, quality, and equipment
+// also still didnt fix scroll yet, only just now realized thats still an issue
 
 export function Admin() {
 
     const [activeTab, setActiveTab] = useState('inventory')
-    const [inventory, setInventory] = useState(sampleInventory)
-    const [orders] = useState(sampleOrders)
+    // removed sample inventory data. We're going to be adding directly into the db now
+    const [inventory, setInventory] = useState([])
+    const [orders] = useState([])
+
+    useEffect(() => {
+        fetch("http://localhost:8080/inventory")
+            .then(res => res.json())
+            .then(data => {
+            const mapped = data.map(item => ({
+                id: item.idinventory,
+                name: item.equipment_name,
+                category: item.category,
+                description: item.equipment_description,
+                total: item.total_equipment,
+                remaining: item.remaining_equipment,
+                dailyRate: item.daily_rate,
+                weeklyRate: item.weekly_rate
+            }))
+            setInventory(mapped)
+         })
+            .catch(err => console.error("Fetch error:", err))
+    }, [])
 
     // state for the add new item formm
     const [newItem, setNewItem] = useState({
@@ -39,26 +48,58 @@ export function Admin() {
 
     // inv functions
 
-    // add tool to inv
-    function handleAddItem() {
-        // very basic validation making sure isn't empty
-        if (!newItem.name.trim()) 
-        {
-            alert('Please enter an item name')
-            return
+    // add tool to inv. Biggest changes here.
+        const handleAddItem = async () => {
+    const payload = {
+        equipment_name: newItem.name,
+        equipment_description: newItem.description,
+        category: newItem.category,
+        total_equipment: newItem.total,
+        remaining_equipment: newItem.total,
+        daily_rate: newItem.dailyRate,
+        weekly_rate: newItem.weeklyRate
+    }
+
+    try {
+        const res = await fetch("http://localhost:8080/inventory", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+        })
+
+        const data = await res.json()
+
+        console.log("Added:", data)
+
+        // add new item to table instantly
+        const mapped = {
+        id: data.idinventory,
+        name: data.equipment_name,
+        category: data.category,
+        description: data.equipment_description,
+        total: data.total_equipment,
+        remaining: data.remaining_equipment,
+        dailyRate: data.daily_rate,
+        weeklyRate: data.weekly_rate
         }
 
-        // this is what we'll change in the future, as the database in the future will handle IDs. 
-        // so im just using fake ones.
-        const item = {
-            id: inventory.length + 1, ...newItem, remaining: newItem.total    
-        }
+        setInventory(prev => [...prev, mapped])
 
-        // add to the list and clear the form
-        setInventory([...inventory, item])
-        setNewItem({ name: '', category: '', description: '', total: 0, dailyRate: 0, weeklyRate: 0 })
-        console.log('Added item:', item)
-        // future: gotta send to backend. That way it updates.
+        // clear form
+        setNewItem({
+        name: '',
+        category: '',
+        description: '',
+        total: 0,
+        dailyRate: 0,
+        weeklyRate: 0
+        })
+
+    } catch (err) {
+        console.error("Add failed:", err)
+      }
     }
 
     // removal
