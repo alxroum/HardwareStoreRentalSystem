@@ -37,12 +37,12 @@ nav {
   position: relative;
   text-align: center;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto auto auto;
   gap: 8px;
   margin-right: 20px;
 }
 
-#admin-page-button, #login-page-button, #cart-page-button {
+#admin-page-button, #account-page-button, #login-page-button, #cart-page-button {
   grid-row: 0;
   padding: 8px;
   background-color: orange;
@@ -60,7 +60,7 @@ nav {
   text-decoration: none;
 }
 
-#admin-page-button:hover, #login-page-button:hover, #cart-page-button:hover {
+#admin-page-button:hover, #account-page-button:hover, #login-page-button:hover, #cart-page-button:hover {
   cursor: pointer;
   background-color: rgb(215, 140, 0);
   text-decoration: none;

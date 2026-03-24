@@ -6,6 +6,7 @@ import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
 import { SignUp } from './pages/SignUp'
+import { Account } from './pages/Account'
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -51,22 +52,28 @@ function Nav() {
         
         <div className='nav-right'>
         <div id="login-area">
-            <Link className="hidden-link" to="/admin" style={{cursor: 'pointer'}}>
-              <div id="admin-page-button">
-                  Admin
-              </div>
-            </Link>
-            <Link className="hidden-link" to="/login" style={{cursor: 'pointer'}}>
-              <div id="login-page-button">
-                  Login
-              </div>
-            </Link>
-            <Link className="hidden-link" to="/cart" style={{cursor: 'pointer'}}>
-              <div id="cart-page-button">
-                  Cart
-                  {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
-              </div>
-            </Link>
+          <Link className="hidden-link" to="/admin" style={{cursor: 'pointer'}}>
+            <div id="admin-page-button">
+                Admin
+            </div>
+          </Link>
+          <Link className="hidden-link" to="/account" style={{cursor: 'pointer'}}>
+            <div id="account-page-button">
+                Account
+                {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
+            </div>
+          </Link>
+          <Link className="hidden-link" to="/login" style={{cursor: 'pointer'}}>
+            <div id="login-page-button">
+                Login
+            </div>
+          </Link>
+          <Link className="hidden-link" to="/cart" style={{cursor: 'pointer'}}>
+            <div id="cart-page-button">
+                Cart
+                {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
+            </div>
+          </Link>
         </div>
         </div>
     </nav>
@@ -85,6 +92,7 @@ function App() {
         <Route path='/admin' element={<Admin/>}/>
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/signUp' element={<SignUp/>}/>
+        <Route path='/account' element={<Account/>}/>
       </Routes>
     </Router>
     </>

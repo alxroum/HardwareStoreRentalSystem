@@ -1,0 +1,40 @@
+* {
+  /* rgb(218, 218, 218) */
+}
+
+#account-page { /* page root */
+    display: grid;
+    grid-template-columns: 30% 70%;
+    margin-top: 30px;
+}
+
+#account-sidebar-section { /* left side of the page container */
+    background-color: blue;
+    
+}
+
+#account-sidebar {
+    background-color: white;
+    padding: 15px;
+}
+
+#profile-picture {
+    width: 80px;
+    aspect-ratio: 1/1;
+    border-radius: 40px;
+    background-color: green;
+}
+
+#account-info { /* right side of the page container */
+    background-color: red;
+}
+
+#account-details {
+    background-color: inherit;
+    color: black;
+}
+
+.account-group { /* group */
+    font-size: x-large;
+    font-weight: 700;
+}
