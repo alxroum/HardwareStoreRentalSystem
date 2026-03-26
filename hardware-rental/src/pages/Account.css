@@ -6,32 +6,88 @@
     display: grid;
     grid-template-columns: 30% 70%;
     margin-top: 30px;
+    gap: 30px;
+    margin: 30px;
 }
 
 #account-sidebar-section { /* left side of the page container */
-    background-color: blue;
-    
 }
 
 #account-sidebar {
-    background-color: white;
+    
+}
+
+#sidebar-top {
     padding: 15px;
+    border-radius: 30px 30px 0 0;
+    padding-top: 30px; 
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: orange;
+    box-shadow: 5px 5px rgb(218, 218, 218);
+}
+
+#account-center {
+    display: flex;
+    align-items: center;
+}
+
+#account-username {
+    padding: 5px;
+    font-weight: 700;
+    font-size: 25px;
+}
+
+#sidebar-bottom {
+    padding-top: 20px;
+    background-color: white;
+    box-shadow: 5px 5px rgb(218, 218, 218);
+    border-radius: 0 0 30px 30px;
+}
+
+.account-menu-button {
+    border: 0;
+    background-color: white;
+    padding: 25px;
+    color: black;
+    width: 100%;
+    font-weight: 700;
+}
+
+.account-menu-button:hover {
+    background-color: rgb(252, 233, 198);
+}
+
+.account-hr {
+    border: 1px solid rgb(218, 218, 218);
 }
 
 #profile-picture {
-    width: 80px;
+    width: 3em;
     aspect-ratio: 1/1;
-    border-radius: 40px;
-    background-color: green;
+    font-size: 40px;
+    font-weight: 700;
+    border-radius: 1.5em;
+    background-color: white;
+    color: orange;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #account-info { /* right side of the page container */
-    background-color: red;
+    margin-right: 30px;
+    color: black;
 }
 
 #account-details {
     background-color: inherit;
     color: black;
+}
+
+#balance-summary {
+    background-color: orange;
 }
 
 .account-group { /* group */
