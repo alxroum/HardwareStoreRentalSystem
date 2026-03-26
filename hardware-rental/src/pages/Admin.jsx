@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import './Admin.css'
 
 // crud: create and read done. Need to do update and delete
-// need to also update fields to consider image, quality, and equipment
+// need to also update fields to consider image, quality, and equipment. (image we might be able to just do a default image, but
+// we do have to handle that with upload or drag and drop.)
 // also still didnt fix scroll yet, only just now realized thats still an issue
 
 export function Admin() {
@@ -34,12 +35,14 @@ export function Admin() {
 
     // state for the add new item formm
     const [newItem, setNewItem] = useState({
-        name: '',
-        category: '',
-        description: '',
-        total: 0,
-        dailyRate: 0,
-        weeklyRate: 0
+    name: '',
+    category: '',
+    description: '',
+    total: 0,
+    dailyRate: 0,
+    weeklyRate: 0,
+    quality: 'Okay',
+    image: null
     })
 
     // tracks which item is being edited (so if its null = we're editing none)
@@ -160,16 +163,22 @@ export function Admin() {
                     {/* add new item form */}
                     <div className="add-item-form">
                         <h3>Add New Item</h3>
+                        {/* r1 name and category */}
                         <div className="form-row">
                             <input
                                 type="text"
                                 placeholder="Item name"
                                 value={newItem.name}
-                                onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, name: e.target.value })
+                                }
                             />
+
                             <select
                                 value={newItem.category}
-                                onChange={(e) => setNewItem({...newItem, category: e.target.value})}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, category: e.target.value })
+                                }
                             >
                                 <option value="">Select Category</option>
                                 <option value="Power Tools">Power Tools</option>
@@ -181,32 +190,79 @@ export function Admin() {
                                 <option value="Demolition">Demolition</option>
                             </select>
                         </div>
+
+                        {/* r2 quality and img */}
+                        <div className="form-row">
+                            <select
+                                value={newItem.quality}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, quality: e.target.value })
+                                }
+                            >
+                                <option value="Okay">Okay</option>
+                                <option value="Good">Good</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="New">New</option>
+                            </select>
+
+                            <input
+                                type="text"
+                                placeholder="Image URL (optional)"
+                                value={newItem.image || ''}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, image: e.target.value })
+                                }
+                            />
+                        </div>
+
+                        {/* r3 description */}
                         <div className="form-row">
                             <input
                                 type="text"
                                 placeholder="Description"
                                 value={newItem.description}
-                                onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, description: e.target.value })
+                                }
                             />
                         </div>
+
+                        {/* r4 quantity and rates */}
                         <div className="form-row">
                             <input
                                 type="number"
                                 placeholder="Quantity"
                                 value={newItem.total || ''}
-                                onChange={(e) => setNewItem({...newItem, total: parseInt(e.target.value) || 0})}
+                                onChange={(e) =>
+                                    setNewItem({
+                                        ...newItem,
+                                        total: parseInt(e.target.value) || 0
+                                    })
+                                }
                             />
+
                             <input
                                 type="number"
                                 placeholder="Daily rate"
                                 value={newItem.dailyRate || ''}
-                                onChange={(e) => setNewItem({...newItem, dailyRate: parseFloat(e.target.value) || 0})}
+                                onChange={(e) =>
+                                    setNewItem({
+                                        ...newItem,
+                                        dailyRate: parseFloat(e.target.value) || 0
+                                    })
+                                }
                             />
+
                             <input
                                 type="number"
                                 placeholder="Weekly rate"
                                 value={newItem.weeklyRate || ''}
-                                onChange={(e) => setNewItem({...newItem, weeklyRate: parseFloat(e.target.value) || 0})}
+                                onChange={(e) =>
+                                    setNewItem({
+                                        ...newItem,
+                                        weeklyRate: parseFloat(e.target.value) || 0
+                                    })
+                                }
                             />
                         </div>
                         <button className="add-button" onClick={handleAddItem}>Add Item</button>
@@ -264,7 +320,7 @@ export function Admin() {
                 </div>
             )}
 
-            {/* order trab  */}
+            {/* order tab  */}
             {activeTab === 'orders' && (
                 <div className="admin-section">
                     <h3>Customer Orders</h3>
@@ -288,7 +344,6 @@ export function Admin() {
                                     <td>{order.item}</td>
                                     <td>{order.dateRented}</td>
                                     <td>{order.dateDue}</td>
-                                    {/* color coding status */}
                                     <td className={`status-${order.status.toLowerCase()}`}>{order.status}</td>
                                     <td>${order.totalCost.toFixed(2)}</td>
                                 </tr>
