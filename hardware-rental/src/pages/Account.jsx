@@ -17,11 +17,15 @@ export function Account() {
         <div id="account-page">
             <div id="account-sidebar-section">
                 <div id="account-sidebar">
-                    <div id="sidebar-top">
+                    {/* <div id="sidebar-top">
                         <div className='account-center'>
-                            <ProfilePicture/> {/* function call */}
+                            <ProfilePicture/> 
                             <div id="account-username">Alex Rouman</div>
                         </div>
+                    </div> */}
+                    <div id="sidebar-top">
+                        <div className="avatar-circle">AR</div>
+                        <div className="sidebar-name">Alex Rouman</div>
                     </div>
                     <div id="sidebar-bottom">
                         <button className='account-menu-button'>My Account</button>
@@ -35,7 +39,7 @@ export function Account() {
                 </div>
             </div>
             <div id="account-info">
-                <div id="balance-summary">
+                {/* <div id="balance-summary">
                     Account Balance
                 </div>
                 <div id="personal-info">
@@ -48,6 +52,30 @@ export function Account() {
                 </div>
                 <div id="delete-section">
                     Delete Account
+                </div> */}
+
+
+                <div className="balance-card">
+                    <div className="balance-top">
+                        <div>
+                            <div className="balance-main-label">Account Balance</div>
+                            <div className="balance-main-amount">$124.50</div>
+                        </div>
+                        <div className="balance-actions">
+                            <button className="btn-withdraw">Withdraw</button>
+                            <button className="btn-add">+ Add Funds</button>
+                        </div>
+                    </div>
+                    <div className="balance-stats">
+                        <div className="stat">
+                            <div className="stat-label">Total Spent</div>
+                            <div className="stat-value">$842.00</div>
+                        </div>
+                        <div className="stat">
+                            <div className="stat-label">Active Rentals</div>
+                            <div className="stat-value green">3</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

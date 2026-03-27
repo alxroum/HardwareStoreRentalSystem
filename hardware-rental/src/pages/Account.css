@@ -1,10 +1,21 @@
 * {
   /* rgb(218, 218, 218) */
+
+  --orange: #F5A800;
+  --orange-dark: rgb(215, 140, 0);
+  --orange-light: #FFF3CC;
+  --gray-dark: #4A4A4A;
+  --gray-mid: #888;
+  --gray-light: #E8E8E8;
+  --bg: #F0F0F0;
+  --white: #FFFFFF;
+  --danger: #D94040;
+  --success: #2E9E5B;
 }
 
 #account-page { /* page root */
     display: grid;
-    grid-template-columns: 30% 70%;
+    grid-template-columns: 20% 80%;
     margin-top: 30px;
     gap: 30px;
     margin: 30px;
@@ -18,25 +29,31 @@
 }
 
 #sidebar-top {
-    padding: 15px;
-    border-radius: 30px 30px 0 0;
-    padding-top: 30px; 
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    background-color: orange;
-    box-shadow: 5px 5px rgb(218, 218, 218);
+  background: var(--orange);
+  padding: 32px 20px 24px;
+  text-align: center;
+  background-color: orange;
+  border-radius: 30px 30px 0 0;
+  box-shadow: 5px 5px rgb(218, 218, 218);
 }
-
-#account-center {
-    display: flex;
-    align-items: center;
+.avatar-circle {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: orange;
+  box-shadow: 0 0 8px rgb(215, 140, 0);
 }
-
-#account-username {
-    padding: 5px;
-    font-weight: 700;
-    font-size: 25px;
+.sidebar-name {
+  color: white;
+  font-weight: 700;
+  font-size: 25px;
 }
 
 #sidebar-bottom {
@@ -46,24 +63,32 @@
     border-radius: 0 0 30px 30px;
 }
 
-.account-menu-button {
+.account-menu-button, #account-logout-button {
     border: 0;
     background-color: white;
     padding: 25px;
     color: black;
     width: 100%;
-    font-weight: 700;
+    font-weight: 500;
+    border: 2px solid white;
+    font-size: 20px;
 }
 
-.account-menu-button:hover {
-    background-color: rgb(252, 233, 198);
+#account-logout-button {
+    margin-bottom: 25px;
+}
+
+.account-menu-button:hover, #account-logout-button:hover {
+    background-color: rgb(254, 240, 215);
+    border: 2px solid rgb(254, 240, 215);
 }
 
 .account-hr {
+    margin: 20px 0;
     border: 1px solid rgb(218, 218, 218);
 }
 
-#profile-picture {
+/* #profile-picture {
     width: 3em;
     aspect-ratio: 1/1;
     font-size: 40px;
@@ -74,12 +99,89 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
+} */
 
 #account-info { /* right side of the page container */
     margin-right: 30px;
     color: black;
 }
+
+.balance-card { 
+    background: white; 
+    border-radius: 30px;
+    box-shadow: 5px 5px rgb(218, 218, 218);
+    overflow: hidden;
+}
+
+.balance-top {
+  background: orange;
+  padding: 28px 28px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.balance-main-label {
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.balance-main-amount {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  padding-left: 25px;
+}
+
+.balance-actions { display: flex; gap: 10px; align-items: flex-end; }
+.btn-add {
+  background: white;
+  color: orange;
+  border: none;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn-add:hover { opacity: 0.9; }
+.btn-withdraw {
+  background: rgb(215, 140, 0);
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.btn-withdraw:hover { background: rgba(255,255,255,0.35); }
+
+.balance-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1.5px solid var(--gray-light);
+}
+
+.stat {
+  padding: 16px 20px;
+  text-align: center;
+  border-right: 1.5px solid var(--gray-light);
+}
+
+.stat:last-child { border-right: none; }
+.stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-mid); margin-bottom: 4px; }
+.stat-value { font-size: 22px; font-weight: 700; color: var(--gray-dark); }
+.stat-value.green { color: var(--success); }
+
+
 
 #account-details {
     background-color: inherit;
