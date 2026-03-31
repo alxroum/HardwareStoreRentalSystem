@@ -18,3 +18,5 @@ MYSQL_DATABASE=hardware_rental
 run "npm i dotenv"
 
 run "npm install express"
+
+run "npm install multer"

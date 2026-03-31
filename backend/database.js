@@ -38,6 +38,15 @@ daily_rate, weekly_rate, image_icon = null, quality = "Okay"
     return rows[0]
 }
 
+export async function deleteInventoryItem(id) {
+    const [result] = await pool.query(
+        `DELETE FROM inventory WHERE idinventory = ?`,
+        [id]
+    )
+
+    return result
+}
+
 //test code
 //const inventory = await getInventory()
 //console.log(inventory)

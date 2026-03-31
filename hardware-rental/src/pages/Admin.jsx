@@ -26,7 +26,8 @@ export function Admin() {
                 total: item.total_equipment,
                 remaining: item.remaining_equipment,
                 dailyRate: item.daily_rate,
-                weeklyRate: item.weekly_rate
+                weeklyRate: item.weekly_rate,
+                image: item.image_icon
             }))
             setInventory(mapped)
          })
@@ -52,67 +53,82 @@ export function Admin() {
     // inv functions
 
     // add tool to inv. Biggest changes here.
-        const handleAddItem = async () => {
-    const payload = {
-        equipment_name: newItem.name,
-        equipment_description: newItem.description,
-        category: newItem.category,
-        total_equipment: newItem.total,
-        remaining_equipment: newItem.total,
-        daily_rate: newItem.dailyRate,
-        weekly_rate: newItem.weeklyRate
-    }
+    const handleAddItem = async () => {
+        const formData = new FormData()
 
-    try {
+        formData.append("equipment_name", newItem.name)
+        formData.append("equipment_description", newItem.description)
+        formData.append("category", newItem.category)
+        formData.append("total_equipment", newItem.total)
+        formData.append("remaining_equipment", newItem.total)
+        formData.append("daily_rate", newItem.dailyRate)
+        formData.append("weekly_rate", newItem.weeklyRate)
+        formData.append("quality", newItem.quality)
+
+        if (newItem.image) {
+            formData.append("image", newItem.image)
+        }
+
         const res = await fetch("http://localhost:8080/inventory", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-        })
+        body: formData
+    })
 
-        const data = await res.json()
+    const data = await res.json()
 
-        console.log("Added:", data)
-
-        // add new item to table instantly
-        const mapped = {
-        id: data.idinventory,
+    // Ensure these keys match the database column names exactly
+    const mapped = {
+        id: data.idinventory, // check if backend uses 'idinventory'
         name: data.equipment_name,
         category: data.category,
         description: data.equipment_description,
         total: data.total_equipment,
         remaining: data.remaining_equipment,
         dailyRate: data.daily_rate,
-        weeklyRate: data.weekly_rate
-        }
+        weeklyRate: data.weekly_rate,
+        image: data.image_icon // This is the key field
+    }
 
-        setInventory(prev => [...prev, mapped])
+    setInventory(prev => [...prev, mapped])
 
-        // clear form
         setNewItem({
-        name: '',
-        category: '',
-        description: '',
-        total: 0,
-        dailyRate: 0,
-        weeklyRate: 0
+            name: '',
+            category: '',
+            description: '',
+            total: 0,
+            dailyRate: 0,
+            weeklyRate: 0,
+            quality: 'Okay',
+            image: null
         })
-
-    } catch (err) {
-        console.error("Add failed:", err)
-      }
     }
 
-    // removal
-    function handleRemoveItem(id) {
-        setInventory(inventory.filter(item => item.id !== id))
-        console.log('Removed item with id:', id)
-        // future: also send to backend
+    function handleImageUpload(e) {
+        const file = e.target.files[0]
+        if (!file) return
+
+        setNewItem({
+            ...newItem,
+            image: file
+        })
     }
 
-    // editing item
+    // removal with actual route
+    async function handleRemoveItem(id) {
+        try {
+            await fetch(`http://localhost:8080/inventory/${id}`, {
+                method: "DELETE"
+            })
+
+            setInventory(prev => prev.filter(item => item.id !== id))
+
+            console.log("Deleted item:", id)
+        } catch (err) {
+            console.error("Delete failed:", err)
+        }
+    }
+
+    // editing item (THIS IS NOT UPDATED YET)
     function handleStartEdit(item) {
         setEditingId(item.id)
         setEditItem({ ...item })
@@ -206,14 +222,11 @@ export function Admin() {
                             </select>
 
                             <input
-                                type="text"
-                                placeholder="Image URL (optional)"
-                                value={newItem.image || ''}
-                                onChange={(e) =>
-                                    setNewItem({ ...newItem, image: e.target.value })
-                                }
-                            />
-                        </div>
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageUpload(e)}
+                                />
+                            </div>
 
                         {/* r3 description */}
                         <div className="form-row">
@@ -272,6 +285,7 @@ export function Admin() {
                     <table className="admin-table">
                         <thead>
                             <tr>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Category</th>
                                 <th>Total</th>
@@ -301,6 +315,17 @@ export function Admin() {
                                     ) : (
                                         <>
                                             {/* display mode */}
+                                             <td>
+                                                {item.image ? (
+                                                    <img
+                                                    src={`http://localhost:8080${item.image}`}
+                                                    alt="item"
+                                                    style={{ width: 150 }}
+                                                    />
+                                                ) : (
+                                                    <span>No Image</span>
+                                                )}
+                                                </td>
                                             <td>{item.name}</td>
                                             <td>{item.category}</td>
                                             <td>{item.total}</td>

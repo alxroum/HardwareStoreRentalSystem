@@ -1,47 +1,79 @@
 import express from 'express'
+import multer from "multer"
 import cors from 'cors';
 import{getInventory} from './database.js'
 import {addInventoryItem} from "./database.js"
+import { deleteInventoryItem } from "./database.js"
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 
-
+const storage = multer.diskStorage({
+  destination: "uploads/",
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname
+    cb(null, uniqueName)
+  }
+})
 
 app.get("/inventory", async (req, res) => {
     const inventory = await getInventory()
     res.send(inventory)
 })
 
+const upload = multer({ storage })
+
 // post req for inv
-app.post("/inventory", async (req, res) => {
-    const {equipment_name, equipment_description, category, total_equipment, daily_rate, weekly_rate, image_icon, quality} = req.body
-    if (
-        !equipment_name ||
-        !category ||
-        total_equipment === undefined ||
-        daily_rate === undefined ||
-        weekly_rate === undefined
-    ) 
-    {
-        return res.status(400).json({ error: "fields missingg" })
-    }
+app.post("/inventory", upload.single("image"), async (req, res) => {
+  try {
+    const imagePath = req.file
+      ? `/uploads/${req.file.filename}`
+      : null
+
+    const {
+      equipment_name,
+      equipment_description,
+      category,
+      total_equipment,
+      daily_rate,
+      weekly_rate,
+      quality
+    } = req.body
 
     const newItem = await addInventoryItem({
-        equipment_name,
-        equipment_description: equipment_description ?? "",
-        category,
-        total_equipment: Number(total_equipment),
-        remaining_equipment: Number(total_equipment),
-        daily_rate: Number(daily_rate),
-        weekly_rate: Number(weekly_rate),
-        image_icon: image_icon ?? null,
-        quality: quality ?? "Okay"
+      equipment_name,
+      equipment_description: equipment_description ?? "",
+      category,
+      total_equipment: Number(total_equipment),
+      remaining_equipment: Number(total_equipment),
+      daily_rate: Number(daily_rate),
+      weekly_rate: Number(weekly_rate),
+      image_icon: imagePath,
+      quality: quality ?? "Okay"
     })
 
     res.status(201).json(newItem)
+
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.use("/uploads", express.static("uploads"))
+
+// delete route
+app.delete("/inventory/:id", async (req, res) => {
+    const id = req.params.id
+
+    try {
+        await deleteInventoryItem(id)
+        res.json({ message: "Item deleted successfully" })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: "Delete failed" })
+    }
 })
 
 app.use((err, req, res, next) => {
@@ -52,3 +84,4 @@ app.use((err, req, res, next) => {
 app.listen(8080, () =>{
     console.log('Server is running on port 8080')
 })
+
