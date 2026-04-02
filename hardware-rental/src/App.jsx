@@ -17,6 +17,7 @@ import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 // import jackhammer from './assets/jackhammer.png'
 // import powerAuger from './assets/power-auger.png'
 import cartIcon from '/assets/cart-icon.png'
+import logo from '/assets/logo.png'
 
 import './styles/App.css'
 
@@ -46,7 +47,7 @@ function Nav() {
     <nav>
         <div className='nav-left'>
         <Link className="hidden-link" to="/" style={{cursor: 'pointer'}}>
-          <h2 id="nav-header">Hardware Rental</h2>
+          <div id="nav-header"> <img id="nav-logo" src={logo}></img> <h2 id="header-text">Hardware Rental</h2> </div>
         </Link>
         </div>
         

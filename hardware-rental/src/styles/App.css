@@ -18,8 +18,21 @@ nav {
   grid-template-columns: 1fr 1fr;
 }
 
+#header-text {
+  margin: 0;
+  padding: 0;
+}
+
 #nav-header {
   color: white;
+  display: flex;
+  align-items: center;
+}
+
+#nav-logo {
+  width: 50px;
+  aspect-ratio: 1/1;
+  padding: 10px;
 }
 
 .nav-left, .nav-right {

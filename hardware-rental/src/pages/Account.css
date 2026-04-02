@@ -181,7 +181,13 @@
 .stat-value { font-size: 22px; font-weight: 700; color: var(--gray-dark); }
 .stat-value.green { color: var(--success); }
 
-
+#info-card {
+    border-radius: 30px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 5px 5px rgb(218, 218, 218);
+    margin-top: 30px;
+}
 
 #account-details {
     background-color: inherit;

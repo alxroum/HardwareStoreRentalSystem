@@ -77,6 +77,11 @@ export function Account() {
                         </div>
                     </div>
                 </div>
+
+                <div id="info-card">
+                    test
+                </div>
+
             </div>
         </div>
     );
