@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
 
-// pages
+// pages (CSS issue is here, uses styling for last page imported, in this case it's SignUp.)
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
 import { SignUp } from './pages/SignUp'
+<<<<<<< Alan2
+=======
 import { Account } from './pages/Account'
+>>>>>>> main
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -92,12 +95,16 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/admin' element={<Admin/>}/>
         <Route path='/cart' element={<Cart/>}/>
+<<<<<<< Alan2
+        <Route path='/signup' element={<SignUp/>}/>
+=======
         <Route path='/signUp' element={<SignUp/>}/>
         <Route path='/account' element={<Account/>}/>
+>>>>>>> main
       </Routes>
     </Router>
     </>
   )
-  
+
 }
 export default App

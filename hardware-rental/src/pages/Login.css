@@ -14,10 +14,11 @@ body {
     border: 10px solid white;
     border-radius: 20px;
 }
-
+/*
 .nav-left {
     width:500px;
 }
+*/
 
 #username-input > input, #password-input > input {
     background-color: white;
@@ -45,4 +46,24 @@ body {
 
 #login-button { /* Resets to default styling for login button. */
     all: unset;
+}
+
+/* Hard-Coded Styling (To fix client-side light/dark mode issues): */
+
+#username-input > input, #password-input > input{
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+}
+
+#login-h1 {
+    color:black;
+}
+
+#sign-up-text {
+    color: black;
+}
+
+#sign-up-link {
+    font-weight: bold;
 }
