@@ -6,6 +6,10 @@ import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
 import { SignUp } from './pages/SignUp'
+<<<<<<< Alan2
+=======
+import { Account } from './pages/Account'
+>>>>>>> main
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -15,6 +19,8 @@ import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 // import chainsaw from './assets/chainsaw.png'
 // import jackhammer from './assets/jackhammer.png'
 // import powerAuger from './assets/power-auger.png'
+import cartIcon from '/assets/cart-icon.png'
+import logo from '/assets/logo.png'
 
 import './styles/App.css'
 
@@ -35,7 +41,7 @@ export function grabToolData() { // grabs the card and tool data from the databa
         })
         .catch(err => console.error("Error fetching inventory:", err))
     }, [])
-    console.log(inventory);
+    //console.log(inventory);
     return inventory;
 }
 
@@ -43,26 +49,35 @@ function Nav() {
   return (
     <nav>
         <div className='nav-left'>
-        <h2>Hardware Rental</h2>
+        <Link className="hidden-link" to="/" style={{cursor: 'pointer'}}>
+          <div id="nav-header"> <img id="nav-logo" src={logo}></img> <h2 id="header-text">Hardware Rental</h2> </div>
+        </Link>
         </div>
         
         <div className='nav-right'>
         <div id="login-area">
-            <div id="admin-button">
-              <Link to="/admin" style={{marginRight: '10px', cursor: 'pointer'}}>
-                  Admin
-              </Link>
+          <Link className="hidden-link" to="/admin" style={{cursor: 'pointer'}}>
+            <div id="admin-page-button">
+                Admin
             </div>
-            <div id="login-button">
-              <Link to="/login" style={{marginRight: '10px', cursor: 'pointer'}}>
-                  Login
-              </Link>
+          </Link>
+          <Link className="hidden-link" to="/account" style={{cursor: 'pointer'}}>
+            <div id="account-page-button">
+                Account
+                {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
             </div>
-            <div id="cart-button">
-              <Link to="/cart" style={{marginRight: '10px', cursor: 'pointer'}}>
-                  Cart
-              </Link>
+          </Link>
+          <Link className="hidden-link" to="/login" style={{cursor: 'pointer'}}>
+            <div id="login-page-button">
+                Login
             </div>
+          </Link>
+          <Link className="hidden-link" to="/cart" style={{cursor: 'pointer'}}>
+            <div id="cart-page-button">
+                Cart
+                {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
+            </div>
+          </Link>
         </div>
         </div>
     </nav>
@@ -80,7 +95,12 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/admin' element={<Admin/>}/>
         <Route path='/cart' element={<Cart/>}/>
+<<<<<<< Alan2
         <Route path='/signup' element={<SignUp/>}/>
+=======
+        <Route path='/signUp' element={<SignUp/>}/>
+        <Route path='/account' element={<Account/>}/>
+>>>>>>> main
       </Routes>
     </Router>
     </>
