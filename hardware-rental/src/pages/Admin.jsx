@@ -50,10 +50,45 @@ export function Admin() {
     const [editingId, setEditingId] = useState(null)
     const [editItem, setEditItem] = useState({})
 
+    // validation layer
+
+    const [formErrors, setFormErrors] = useState([])
+
+    function validateItem(item) {
+        const errors = []
+
+        if (!item.name || item.name.trim() === '')
+            errors.push("item name is required.")
+
+        if (!item.category || item.category === '')
+            errors.push("category is required.")
+
+        if (!Number.isInteger(Number(item.total)) || item.total <= 0)
+            errors.push("quantity must be a positive whole number.")
+
+        if (isNaN(item.dailyRate) || item.dailyRate <= 0)
+            errors.push("daily rate must be a positive number.")
+
+        if (isNaN(item.weeklyRate) || item.weeklyRate <= 0)
+            errors.push("weekly rate must be a positive number.")
+
+        if (item.weeklyRate < item.dailyRate)
+            errors.push("weekly rate should be greater than or equal to daily rate.")
+
+        return errors
+    }
+
+
     // inv functions
 
     // add tool to inv. Biggest changes here.
     const handleAddItem = async () => {
+        const errors = validateItem(newItem)
+        if (errors.length > 0) {
+            setFormErrors(errors)
+            return
+        }
+        setFormErrors([])
         const formData = new FormData()
 
         formData.append("equipment_name", newItem.name)
@@ -136,6 +171,13 @@ export function Admin() {
 
     // save edited item
     async function handleSaveEdit() {
+        const errors = validateItem(editItem)
+        if (errors.length > 0) {
+            setFormErrors(errors)
+            return
+        }
+        setFormErrors([])
+
         try {
             const res = await fetch(`http://localhost:8080/inventory/${editingId}`, {
                 method: "PUT",
@@ -204,7 +246,7 @@ export function Admin() {
             {/* inv tab */}
             {activeTab === 'inventory' && (
                 <div className="admin-section">
-
+                    
                     {/* add new item form */}
                     <div className="add-item-form">
                         <h3>Add New Item</h3>
@@ -274,13 +316,12 @@ export function Admin() {
                             <input
                                 type="number"
                                 placeholder="Quantity"
+                                min="1"
                                 value={newItem.total || ''}
-                                onChange={(e) =>
-                                    setNewItem({
-                                        ...newItem,
-                                        total: parseInt(e.target.value) || 0
-                                    })
-                                }
+                                onChange={(e) => setNewItem({
+                                    ...newItem,
+                                    total: parseInt(e.target.value) || 0
+                                })}
                             />
 
                             <input
@@ -307,6 +348,13 @@ export function Admin() {
                                 }
                             />
                         </div>
+                        {formErrors.length > 0 && (
+                        <div className="form-errors">
+                             {formErrors.map((err, i) => (
+                                <p key={i}>Invalid: {err}</p>
+                            ))}
+                        </div>
+                        )}
                         <button className="add-button" onClick={handleAddItem}>Add Item</button>
                     </div>
 
