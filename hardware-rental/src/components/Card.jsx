@@ -5,10 +5,14 @@ import { useId } from "react";
 export function Card({
     category = "UNCATEGORIZED",
     equipment_name = "Unnamed",
+    equipment_description = "No description",
     quality = "Unspecified",
     daily_rate = 0,
     weekly_rate = 0,
-    image_icon = "power-auger.png"
+    image_icon = "power-auger.png",
+    onCardClick,
+    onReserveButton,
+    onCartButton
 }) {
 
     const c_id = "card_" + useId(); // assign a unique id to be used as the card's id html parameter

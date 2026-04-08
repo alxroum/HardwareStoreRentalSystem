@@ -39,6 +39,12 @@ export function Home() {
 
 
     const tools = grabToolData(); // call the grab function that sits in App.jsx
+
+    const [selectedTool, setSelectedTool] = useState(null); // holds the tool that has been selected for the detailed popup
+    
+    const toggleExpanded = () => {
+        setExpanded(!expanded);
+    };
     
     function categorize() {
         // only display cards that have the active category
@@ -50,14 +56,12 @@ export function Home() {
 
         return (
             filteredTools.map(tool => ( // map the data from a filtered list of tools into a card with each variable set
-                <Card key={tool.id} {...tool} />
+                <Card key={tool.id} onCardClick={() => setSelectedTool(tool)} {...tool} />
             ))
         )
     }
 
     const categoryButtons  = ["ALL", ...new Set(tools.map(t => t.category))];
-
-    const [expanded, setExpanded] = useState(false); // expanded is true if a card is clicked and a larger popup should appear
 
     return (
         <>
@@ -86,8 +90,26 @@ export function Home() {
             </div>
         </div>
 
-        {expanded && (
-            test
+        {selectedTool && (
+            <div className="overlay" onClick={() => setSelectedTool(null)}>
+                <div className="modal" onClick={e => e.stopPropagation()}>
+                    <button className="close-btn" onClick={() => setSelectedTool(null)}>✕</button>
+                    <img src={`/assets/${selectedTool.image_icon}`} alt={selectedTool.equipment_name} />
+                    <h2>{selectedTool.equipment_name}</h2>
+                    <p>{selectedTool.equipment_description}</p>
+                    <p>{selectedTool.category}</p>
+                    <p>Condition: {selectedTool.quality}</p>
+                    <p>Daily: ${selectedTool.daily_rate.toFixed(2)}</p>
+                    <p>Weekly: ${selectedTool.weekly_rate.toFixed(2)}</p>
+                    <div className='left'>
+                        test
+                    </div>
+                    <div className='right'>
+                        test right
+                    </div>
+                    <button className="reserve-button">Reserve Now</button>
+                </div>
+            </div>
         )}
 
         </>

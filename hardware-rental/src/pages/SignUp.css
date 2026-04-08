@@ -3,6 +3,7 @@
 body {
     justify-content: center;
     background-color: #f0f0f0;
+    overflow-y: auto;
 }
 
 .signup-label {
@@ -26,7 +27,7 @@ body {
     box-shadow: 3px 3px rgb(218, 218, 218);
     color: black;
     width: 300px;
-    height: 250px;
+    height: 430px;
 }
 
 #register-account {
@@ -39,4 +40,32 @@ body {
 
 #signup-button { /* Resets to default styling for login button. */
     all: unset;
+}
+
+#disclaimer {
+    justify-content: center;
+    background-color: lightgray;
+    width:300px;
+    margin: 0 auto;
+    border-radius: 20px;
+}
+
+/* Hard-Coded Styling (To fix client-side light/dark mode issues):  */
+
+#confirm-password-input > input, #email-input > input, #phone-input > input, #address-input > input {
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+}
+
+#signup-h1 {
+    color: black;
+}
+
+#signup-h5 {
+    color: lightcoral;
+}
+
+#disclaimer-text {
+    color: black;
 }

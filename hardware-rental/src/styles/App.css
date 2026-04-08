@@ -15,10 +15,27 @@ nav {
   background-color: var(--theme-color);
   text-align: left;
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 1fr 1fr;
 }
 
-.nav-left {
+#header-text {
+  margin: 0;
+  padding: 0;
+}
+
+#nav-header {
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+#nav-logo {
+  width: 50px;
+  aspect-ratio: 1/1;
+  padding: 10px;
+}
+
+.nav-left, .nav-right {
   grid-row: 0;
   display: flex;
   align-items: center;
@@ -28,31 +45,38 @@ nav {
   padding-left: 20px;
 }
 
-.nav-right {
-  grid-row: 0;
-  display: flex;
-  align-items: center;
-}
-
 #login-area {
-  aspect-ratio: 1/1;
   margin-left: auto;
-  padding: 20px;
   position: relative;
   text-align: center;
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  gap: 8px;
+  margin-right: 20px;
 }
 
-#login-button {
-  background-color: rgb(237, 237, 237);
-  width: fit-content;
-  aspect-ratio: 1/1;
-  padding: 5px;
-  border-radius: 5em;
-}
-
-#login-button > *, #admin-button > * {
+#admin-page-button, #account-page-button, #login-page-button, #cart-page-button {
+  grid-row: 0;
+  padding: 8px;
+  background-color: orange;
+  border-radius: 10px;
   color: white;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  text-decoration: none;
   font-weight: 700;
+}
+
+.hidden-link {
+  text-decoration: none;
+}
+
+#admin-page-button:hover, #account-page-button:hover, #login-page-button:hover, #cart-page-button:hover {
+  cursor: pointer;
+  background-color: rgb(215, 140, 0);
+  text-decoration: none;
 }
 
 .two-parts {
@@ -230,4 +254,27 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: white;
+    color: black;
+    width: 90%;
+    border-radius: 10px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }

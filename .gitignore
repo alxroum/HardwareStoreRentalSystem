@@ -17,6 +17,7 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 **/node_modules/
+./hardware-rental/node_modules/*
 .idea
 .DS_Store
 *.suo
