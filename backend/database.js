@@ -38,6 +38,21 @@ daily_rate, weekly_rate, image_icon = null, quality = "Okay"
     return rows[0]
 }
 
+export async function updateInventoryItem(id, { equipment_name, equipment_description, category, total_equipment, daily_rate, weekly_rate, quality }) {
+    const [result] = await pool.query(
+        `UPDATE inventory SET equipment_name = ?, equipment_description = ?, category = ?,
+         total_equipment = ?, daily_rate = ?, weekly_rate = ?, quality = ?
+         WHERE idinventory = ?`,
+        [equipment_name, equipment_description, category, total_equipment, daily_rate, weekly_rate, quality, id]
+    )
+
+    const [rows] = await pool.query(
+        `SELECT * FROM inventory WHERE idinventory = ?`, [id]
+    )
+
+    return rows[0]
+}
+
 export async function deleteInventoryItem(id) {
     const [result] = await pool.query(
         `DELETE FROM inventory WHERE idinventory = ?`,

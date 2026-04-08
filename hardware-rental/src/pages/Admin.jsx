@@ -135,13 +135,42 @@ export function Admin() {
     }
 
     // save edited item
-    function handleSaveEdit() {
-        setInventory(inventory.map(item =>
-            item.id === editingId ? editItem : item
-        ))
-        setEditingId(null)
-        console.log('Updated item:', editItem)
-        // future: backend
+    async function handleSaveEdit() {
+        try {
+            const res = await fetch(`http://localhost:8080/inventory/${editingId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    equipment_name: editItem.name,
+                    equipment_description: editItem.description,
+                    category: editItem.category,
+                    total_equipment: editItem.total,
+                    daily_rate: editItem.dailyRate,
+                    weekly_rate: editItem.weeklyRate,
+                    quality: editItem.quality ?? "Okay"
+                })
+            })
+
+            const data = await res.json()
+
+            const mapped = {
+                id: data.idinventory,
+                name: data.equipment_name,
+                category: data.category,
+                description: data.equipment_description,
+                total: data.total_equipment,
+                remaining: data.remaining_equipment,
+                dailyRate: data.daily_rate,
+                weeklyRate: data.weekly_rate,
+                image: data.image_icon
+            }
+
+            setInventory(prev => prev.map(item => item.id === editingId ? mapped : item))
+            setEditingId(null)
+            setEditItem({})
+        } catch (err) {
+            console.error("Update failed:", err)
+        }
     }
 
     // cancel editing, we should go here in the case to not update the backend on a cancel.
@@ -299,14 +328,40 @@ export function Admin() {
                             {inventory.map(item => (
                                 <tr key={item.id}>
                                     {editingId === item.id ? (
-                                        <>
-                                            {/* edint fields */}
-                                            <td><input value={editItem.name} onChange={(e) => setEditItem({...editItem, name: e.target.value})}/></td>
-                                            <td><input value={editItem.category} onChange={(e) => setEditItem({...editItem, category: e.target.value})}/></td>
-                                            <td><input type="number" value={editItem.total} onChange={(e) => setEditItem({...editItem, total: parseInt(e.target.value) || 0})}/></td>
+                                    <>
+                                            {/* image cell - not editable, just show current */}
+                                            <td>
+                                                {item.image ? (
+                                                    <img
+                                                        src={`http://localhost:8080${item.image}`}
+                                                        alt="item"
+                                                        style={{ width: 60 }}
+                                                    />
+                                                ) : (
+                                                    <span>No Image</span>
+                                                )}
+                                            </td>
+                                            {/* edit fields */}
+                                            <td><input value={editItem.name ?? ''} onChange={(e) => setEditItem({...editItem, name: e.target.value})}/></td>
+                                            <td> {/* this creates our dropdown. If we want more add here for the ufuture. */}
+                                                <select
+                                                    value={editItem.category ?? ''}
+                                                    onChange={(e) => setEditItem({...editItem, category: e.target.value})}
+                                                >
+                                                    <option value="">Select Category</option>
+                                                    <option value="Power Tools">Power Tools</option>
+                                                    <option value="Cleaning">Cleaning</option>
+                                                    <option value="Painting">Painting</option>
+                                                    <option value="Yard and Garden">Yard and Garden</option>
+                                                    <option value="Masonry">Masonry</option>
+                                                    <option value="Access">Access</option>
+                                                    <option value="Demolition">Demolition</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" value={editItem.total ?? 0} onChange={(e) => setEditItem({...editItem, total: parseInt(e.target.value) || 0})}/></td>
                                             <td>{item.remaining}</td>
-                                            <td><input type="number" value={editItem.dailyRate} onChange={(e) => setEditItem({...editItem, dailyRate: parseFloat(e.target.value) || 0})}/></td>
-                                            <td><input type="number" value={editItem.weeklyRate} onChange={(e) => setEditItem({...editItem, weeklyRate: parseFloat(e.target.value) || 0})}/></td>
+                                            <td><input type="number" value={editItem.dailyRate ?? 0} onChange={(e) => setEditItem({...editItem, dailyRate: parseFloat(e.target.value) || 0})}/></td>
+                                            <td><input type="number" value={editItem.weeklyRate ?? 0} onChange={(e) => setEditItem({...editItem, weeklyRate: parseFloat(e.target.value) || 0})}/></td>
                                             <td>
                                                 <button className="save-button" onClick={handleSaveEdit}>Save</button>
                                                 <button className="cancel-button" onClick={handleCancelEdit}>Cancel</button>
