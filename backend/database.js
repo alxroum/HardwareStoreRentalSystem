@@ -38,19 +38,58 @@ daily_rate, weekly_rate, image_icon = null, quality = "Okay"
     return rows[0]
 }
 
-export async function updateInventoryItem(id, { equipment_name, equipment_description, category, total_equipment, daily_rate, weekly_rate, quality }) {
-    const [result] = await pool.query(
-        `UPDATE inventory SET equipment_name = ?, equipment_description = ?, category = ?,
-         total_equipment = ?, daily_rate = ?, weekly_rate = ?, quality = ?
-         WHERE idinventory = ?`,
-        [equipment_name, equipment_description, category, total_equipment, daily_rate, weekly_rate, quality, id]
-    )
+export async function updateInventoryItem(
+  id,{equipment_name, equipment_description, category, total_equipment, daily_rate, weekly_rate,quality}
+) {
+  const [currentRows] = await pool.query(
+    `SELECT total_equipment, remaining_equipment
+     FROM inventory
+     WHERE idinventory = ?`,
+    [id]
+  )
 
-    const [rows] = await pool.query(
-        `SELECT * FROM inventory WHERE idinventory = ?`, [id]
-    )
+  if (currentRows.length === 0) {
+    throw new Error("Item not found")
+  }
 
-    return rows[0]
+  const currentItem = currentRows[0]
+
+  const oldTotal = Number(currentItem.total_equipment)
+  const oldRemaining = Number(currentItem.remaining_equipment)
+  // simple math, available should adapt to total items for updated tools
+  const rentedOut = oldTotal - oldRemaining
+
+  const newTotal = Number(total_equipment)
+
+  if (newTotal < rentedOut) {
+    // this should kinda crash the page. There shouldn't be a scenario where we have less
+    // than whats available. If that item somehow makes through it must be deleted or crash on edit
+    // (unless positively)
+    throw new Error("total equipment cannot be less than number currently rented out")
+  }
+
+  const newRemaining = newTotal - rentedOut
+
+  await pool.query(
+    `UPDATE inventory
+     SET equipment_name = ?,
+         equipment_description = ?,
+         category = ?,
+         total_equipment = ?,
+         remaining_equipment = ?,
+         daily_rate = ?,
+         weekly_rate = ?,
+         quality = ?
+     WHERE idinventory = ?`,
+    [equipment_name, equipment_description, category, newTotal, newRemaining, daily_rate, weekly_rate, quality, id]
+  )
+
+  const [rows] = await pool.query(
+    `SELECT * FROM inventory WHERE idinventory = ?`,
+    [id]
+  )
+
+  return rows[0]
 }
 
 export async function deleteInventoryItem(id) {
