@@ -45,7 +45,7 @@ export function Login() {
         }
         if(password === "") {
             console.log("Password field empty.");
-            alert("Password field must be fileld out.");
+            alert("Password field must be filled out.");
             hasEmptyInput = true;
         }
     }
