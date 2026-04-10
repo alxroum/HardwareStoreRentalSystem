@@ -202,3 +202,192 @@
     font-size: x-large;
     font-weight: 700;
 }
+
+/* Personal Info Component */
+
+#pi-root * { box-sizing: border-box; margin: 0; padding: 0; }
+
+#pi-card {
+  border-radius: 30px;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 5px 5px rgb(218, 218, 218);
+  margin-top: 30px;
+}
+
+#pi-header {
+  padding: 18px 28px 16px;
+  border-bottom: 1.5px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#pi-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--gray-dark);
+}
+
+#pi-edit-btn {
+  background: none;
+  border: 1.5px solid var(--orange);
+  color: var(--orange-dark);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 5px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+#pi-edit-btn:hover { background: var(--orange); color: white; }
+
+#pi-body { padding: 24px 28px; }
+
+#pi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+/* Individual field wrappers — use IDs for unique fields */
+#pi-field-username,
+#pi-field-email,
+#pi-field-phone,
+#pi-field-password,
+#pi-field-address {
+  display: flex;
+  flex-direction: column;
+}
+
+#pi-field-address { grid-column: 1 / -1; }
+
+#pi-field-username label,
+#pi-field-email label,
+#pi-field-phone label,
+#pi-field-password label,
+#pi-field-address label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gray-mid);
+  margin-bottom: 6px;
+}
+
+#pi-field-username input,
+#pi-field-email input,
+#pi-field-phone input,
+#pi-field-password input,
+#pi-field-address input {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Barlow', sans-serif;
+  color: var(--gray-dark);
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#pi-field-username input:focus,
+#pi-field-email input:focus,
+#pi-field-phone input:focus,
+#pi-field-password input:focus,
+#pi-field-address input:focus {
+  border-color: var(--orange);
+  background: white;
+}
+
+#pi-field-username input:disabled,
+#pi-field-email input:disabled,
+#pi-field-phone input:disabled,
+#pi-field-password input:disabled,
+#pi-field-address input:disabled {
+  cursor: default;
+  background: var(--bg);
+}
+
+#pi-field-password input[type="password"] {
+  letter-spacing: 3px;
+  font-size: 18px;
+}
+
+#pi-pw-wrap { position: relative; }
+#pi-pw-wrap input { padding-right: 44px; }
+
+#pi-pw-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--gray-mid);
+  line-height: 1;
+}
+
+#pi-save-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#pi-btn-cancel {
+  background: none;
+  border: 1.5px solid var(--gray-light);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gray-mid);
+  padding: 9px 22px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+#pi-btn-cancel:hover { border-color: var(--gray-mid); }
+
+#pi-btn-save {
+  background: var(--orange);
+  border: none;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  padding: 9px 28px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#pi-btn-save:hover { background: var(--orange-dark); }
+
+#pi-toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--gray-dark);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  z-index: 100;
+}
+#pi-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}

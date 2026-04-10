@@ -7,6 +7,7 @@ import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
 import { SignUp } from './pages/SignUp'
 import { Account } from './pages/Account'
+import { createContext, useContext } from 'react';
 import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 
 // // graphics
@@ -85,6 +86,7 @@ function App() {
   
   return (
     <>
+    {/* Create a context provider for the user information. This will allow all pages to access and change the user id */}
     <Router>
       <Nav/> {/* Display the navigation on all pages */}
       <Routes>

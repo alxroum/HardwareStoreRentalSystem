@@ -8,6 +8,31 @@ import { Home } from './Home'
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+async function validateLogin(username, password) {
+    try {
+        const response = await fetch("http://localhost:8080/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Login failed");
+        }
+
+        const data = await response.json();
+        
+        // Return the safe user data instead of 'true'
+        return data.user; 
+
+    } catch (error) {
+        console.error("Login error:", error.message);
+        alert(error.message); 
+        return null; // Return null instead of 'false'
+    }
+}
+
 /* Primary Function: */
 export function Login() {
 
@@ -18,7 +43,7 @@ export function Login() {
     let hasEmptyInput = true;
 
     /* Gathers Login Information */
-    function processLogin() {
+    async function processLogin() {
 
         /* Checks for empty input fields: */
         checkFields();
@@ -27,8 +52,22 @@ export function Login() {
         if(hasEmptyInput == false) {
             /* Backend validation should be performed here. */
 
+            // make sure credentials are correct in the backend
+            
+            const userData = await validateLogin(username, password);
+
+            if(userData) {
+                localStorage.setItem("LOGGEDIN", true);
+                localStorage.setItem("loggedInUser", JSON.stringify(userData));
+            } else {
+                localStorage.setItem("LOGGEDIN", false);
+            }
+            // if they are, grab the userid and set it to local storage
+            
+            // otherwise, throw error
+
             /* Brings the user back to the home page. */
-            returnToHome("/Home");
+            returnToHome("/");
         }
         else {
             console.log("Empty input value is true.");
@@ -45,7 +84,7 @@ export function Login() {
         }
         if(password === "") {
             console.log("Password field empty.");
-            alert("Password field must be fileld out.");
+            alert("Password field must be filled out.");
             hasEmptyInput = true;
         }
     }
