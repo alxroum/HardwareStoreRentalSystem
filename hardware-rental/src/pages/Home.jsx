@@ -87,21 +87,42 @@ export function Home() {
         {selectedTool && (
             <div className="overlay" onClick={() => setSelectedTool(null)}>
                 <div className="modal" onClick={e => e.stopPropagation()}>
-                    <button className="close-btn" onClick={() => setSelectedTool(null)}>✕</button>
-                    <img src={`/assets/${selectedTool.image_icon}`} alt={selectedTool.equipment_name} />
+                <button className="close-btn" onClick={() => setSelectedTool(null)}>✕</button>
+                
+                <div className="modal-body">
+                    {/* Left Side: Visuals */}
+                    <div className="modal-image-section">
+                    <img 
+                        src={`/assets/${selectedTool.image_icon}`} 
+                        alt={selectedTool.equipment_name} 
+                        className="modal-img"
+                    />
+                    <span className="category-badge">{selectedTool.category}</span>
+                    </div>
+
+                    {/* Right Side: Information */}
+                    <div className="modal-info-section">
                     <h2>{selectedTool.equipment_name}</h2>
-                    <p>{selectedTool.equipment_description}</p>
-                    <p>{selectedTool.category}</p>
-                    <p>Condition: {selectedTool.quality}</p>
-                    <p>Daily: ${selectedTool.daily_rate.toFixed(2)}</p>
-                    <p>Weekly: ${selectedTool.weekly_rate.toFixed(2)}</p>
-                    <div className='left'>
-                        test
+                    <p className="description">{selectedTool.equipment_description}</p>
+                    
+                    <div className="details-grid">
+                        <div className="detail-item">
+                        <span className="label">Condition</span>
+                        <span className="value">{selectedTool.quality}</span>
+                        </div>
+                        <div className="detail-item">
+                        <span className="label">Daily Rate</span>
+                        <span className="value primary">${selectedTool.daily_rate.toFixed(2)}</span>
+                        </div>
+                        <div className="detail-item">
+                        <span className="label">Weekly Rate</span>
+                        <span className="value">${selectedTool.weekly_rate.toFixed(2)}</span>
+                        </div>
                     </div>
-                    <div className='right'>
-                        test right
-                    </div>
+
                     <button className="reserve-button">Reserve Now</button>
+                    </div>
+                </div>
                 </div>
             </div>
         )}

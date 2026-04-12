@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './Account.css'
 import { useEffect } from 'react';
 import { Login, validateLogin } from './Login';
+import { useNavigate } from 'react-router-dom';
 
 function ProfilePicture(username) {
     return (
@@ -18,11 +19,6 @@ const DEFAULT_DATA = {
   password: "Password",
   address: "Address",
 };
-
-function logout() {
-    localStorage.setItem("USER", null);
-    localStorage.setItem("LOGGEDIN", false);
-}
 
 export default function PersonalInfo({ initialData = DEFAULT_DATA, onSave }) {
     //   const [editing, setEditing] = useState(false);
@@ -91,10 +87,17 @@ export default function PersonalInfo({ initialData = DEFAULT_DATA, onSave }) {
 export function Account() {
 
     // import global states from context provider in App.jsx
-    const [loggedIn] = useState(localStorage.getItem("LOGGEDIN"));
+    const [loggedIn] = useState(localStorage.getItem("LOGGEDIN") === "true");
     const dataString = localStorage.getItem("USER");
     const userData = JSON.parse(dataString);
     const [funds, setFunds] = useState('');
+    const navigateHome = useNavigate();
+
+    const logout = () => {
+        localStorage.setItem("USER", null);
+        localStorage.setItem("LOGGEDIN", false);
+        navigateHome("/");
+    }
 
     const addFunds = async () => {
         // 1. Frontend Validation
@@ -139,7 +142,7 @@ export function Account() {
 
     return (
         <>
-        {true && ( /* TODO needs to be changed to loggedIn instead of true */
+        {loggedIn && ( /* TODO needs to be changed to loggedIn instead of true */
             <div id="account-page">
                 <div id="account-sidebar-section">
                     <div id="account-sidebar">
@@ -154,7 +157,7 @@ export function Account() {
                             <div className="sidebar-name">Alex Rouman</div>
                         </div>
                         <div id="sidebar-bottom">
-                            <button id="account-logout-button">
+                            <button id="account-logout-button" onClick={logout}>
                                 Logout
                             </button>
                         </div>
@@ -176,7 +179,7 @@ export function Account() {
                                     value={funds}               // This links the UI to your state
                                     onChange={(e) => {
                                         if (e.target.value === "" || /^\d*\.?\d{0,2}$/.test(e.target.value)) {
-                                        setFunds(e.target.value);
+                                            setFunds(e.target.value);
                                         }
                                     }} 
                                 />
