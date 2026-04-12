@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './Account.css'
+import { useEffect } from 'react';
+import { Login, validateLogin } from './Login';
 
 function ProfilePicture(username) {
     return (
@@ -17,134 +19,72 @@ const DEFAULT_DATA = {
   address: "Address",
 };
 
+function logout() {
+    localStorage.setItem("USER", null);
+    localStorage.setItem("LOGGEDIN", false);
+}
+
 export default function PersonalInfo({ initialData = DEFAULT_DATA, onSave }) {
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState(initialData);
-  const [draft, setDraft] = useState(initialData);
-  const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast] = useState(false);
+    //   const [editing, setEditing] = useState(false);
+    const [saveData, setsaveData] = useState(initialData);
 
-  const handleEdit = () => {
-    setDraft(form);
-    setEditing(true);
-  };
+    const val = (field) => (saveData[field]);
 
-  const handleCancel = () => {
-    setDraft(form);
-    setEditing(false);
-    setShowPassword(false);
-  };
+    return (
+        <div id="pi-root">
+            <div id="pi-card">
 
-  const handleSave = () => {
-    setForm(draft);
-    setEditing(false);
-    setShowPassword(false);
-    onSave?.(draft);
-    setToast(true);
-    setTimeout(() => setToast(false), 2800);
-  };
+            <div id="pi-header">
+                <div id="pi-title">Personal Information</div>
+            </div>
 
-  const handleChange = (field) => (e) => {
-    setDraft((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+            <div id="pi-body">
+                <div id="pi-grid">
 
-  const val = (field) => (editing ? draft[field] : form[field]);
+                <div id="pi-field-username">
+                    <label htmlFor="pi-username">Username</label>
+                    <div id="pi-username">
+                        {val("username")}
+                    </div>
+                </div>
 
-  return (
-    <div id="pi-root">
-      <div id="pi-card">
+                <div id="pi-field-email">
+                    <label htmlFor="pi-email">Email Address</label>
+                    <div id="pi-email">
+                        {val("email")}
+                    </div>
+                </div>
 
-        <div id="pi-header">
-          <div id="pi-title">Personal Information</div>
-          <button id="pi-edit-btn" onClick={editing ? handleCancel : handleEdit}>
-            {editing ? "Cancel" : "Edit"}
-          </button>
+                <div id="pi-field-phone">
+                    <label htmlFor="pi-phone">Phone Number</label>
+                    <div id="pi-phone">
+                        {val("phone")}
+                    </div>
+                </div>
+
+                <div id="pi-field-address">
+                    <label htmlFor="pi-address">Street Address</label>
+                    <div id="pi-address">
+                        {val("address")}
+                    </div>
+                </div>
+
+                </div>
+
+                {/* {editing && (
+                <div id="pi-save-row">
+                    <button id="pi-btn-cancel" onClick={handleCancel}>Cancel</button>
+                    <button id="pi-btn-save" onClick={handleSave}>Save Changes</button>
+                </div>
+                )} */}
+            </div>
+            </div>
+
+            {/* <div id="pi-toast" className={toast ? "show" : ""}>
+            Changes saved successfully
+            </div> */}
         </div>
-
-        <div id="pi-body">
-          <div id="pi-grid">
-
-            <div id="pi-field-username">
-              <label htmlFor="pi-username">Username</label>
-              <input
-                id="pi-username"
-                type="text"
-                value={val("username")}
-                onChange={handleChange("username")}
-                disabled={!editing}
-              />
-            </div>
-
-            <div id="pi-field-email">
-              <label htmlFor="pi-email">Email Address</label>
-              <input
-                id="pi-email"
-                type="email"
-                value={val("email")}
-                onChange={handleChange("email")}
-                disabled={!editing}
-              />
-            </div>
-
-            <div id="pi-field-phone">
-              <label htmlFor="pi-phone">Phone Number</label>
-              <input
-                id="pi-phone"
-                type="tel"
-                value={val("phone")}
-                onChange={handleChange("phone")}
-                disabled={!editing}
-              />
-            </div>
-
-            <div id="pi-field-password">
-              <label htmlFor="pi-password">Password</label>
-              <div id="pi-pw-wrap">
-                <input
-                  id="pi-password"
-                  type={showPassword ? "text" : "password"}
-                  value={val("password")}
-                  onChange={handleChange("password")}
-                  disabled={!editing}
-                />
-                <button
-                  id="pi-pw-toggle"
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  title={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? ">" : "0"}
-                </button>
-              </div>
-            </div>
-
-            <div id="pi-field-address">
-              <label htmlFor="pi-address">Street Address</label>
-              <input
-                id="pi-address"
-                type="text"
-                value={val("address")}
-                onChange={handleChange("address")}
-                disabled={!editing}
-              />
-            </div>
-
-          </div>
-
-          {editing && (
-            <div id="pi-save-row">
-              <button id="pi-btn-cancel" onClick={handleCancel}>Cancel</button>
-              <button id="pi-btn-save" onClick={handleSave}>Save Changes</button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div id="pi-toast" className={toast ? "show" : ""}>
-        Changes saved successfully
-      </div>
-    </div>
-  );
+    );
 }
 
 
@@ -152,7 +92,50 @@ export function Account() {
 
     // import global states from context provider in App.jsx
     const [loggedIn] = useState(localStorage.getItem("LOGGEDIN"));
-    const [user] = useState(localStorage.getItem("USER"));
+    const dataString = localStorage.getItem("USER");
+    const userData = JSON.parse(dataString);
+    const [funds, setFunds] = useState('');
+
+    const addFunds = async () => {
+        // 1. Frontend Validation
+        if (!funds || isNaN(parseFloat(funds)) || parseFloat(funds) <= 0) {
+            alert("Please enter a valid amount greater than 0.");
+            return;
+        }
+
+        try {
+            // 2. The API Call
+            const response = await fetch(`http://localhost:8080/users/${userData.username}/funds`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "deposit", // Telling the backend to add money
+                    amount: funds      // The string from your state
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(`Success! New balance: $${data.newBalance}`);
+                var temp = JSON.parse(dataString); // object
+                temp.account_balance = "" + data.newBalance;
+                console.log(temp);
+                
+                localStorage.setItem("USER", JSON.stringify(temp));
+                // userData.account_balance = data.newBalance;
+            // 3. CLEAR the input to reveal the placeholder
+            setFunds(""); 
+            } else {
+            alert(data.error || "Something went wrong");
+            }
+        } catch (err) {
+            console.error("Network error:", err);
+            alert("Could not connect to the server.");
+        }
+    };
+
+    console.log(userData);
 
     return (
         <>
@@ -183,26 +166,37 @@ export function Account() {
                         <div className="balance-top">
                             <div>
                                 <div className="balance-main-label">Account Balance</div>
-                                <div className="balance-main-amount">$124.50</div>
+                                <div className="balance-main-amount">{"$" + userData.account_balance}</div>
                             </div>
                             <div className="balance-actions">
-                                <button className="btn-withdraw">Withdraw</button>
-                                <button className="btn-add">+ Add Funds</button>
+                                {/* <button className="btn-withdraw">Withdraw</button> */}
+                                <input 
+                                    id='btn-input'
+                                    placeholder="Enter amount..." // This shows up when funds === ""
+                                    value={funds}               // This links the UI to your state
+                                    onChange={(e) => {
+                                        if (e.target.value === "" || /^\d*\.?\d{0,2}$/.test(e.target.value)) {
+                                        setFunds(e.target.value);
+                                        }
+                                    }} 
+                                />
+                                
+                                <button className="btn-add" onClick={addFunds}>
+                                + Add Funds
+                                </button>
                             </div>
                         </div>
-                        <div className="balance-stats">
-                            <div className="stat">
-                                <div className="stat-label">Total Spent</div>
-                                <div className="stat-value">$842.00</div>
-                            </div>
-                            <div className="stat">
-                                <div className="stat-label">Active Rentals</div>
-                                <div className="stat-value green">3</div>
-                            </div>
-                        </div>
+                        
                     </div>
 
-                    <PersonalInfo></PersonalInfo>
+                    {/* make sure that if the userdata is null, this doesn't error out */}
+                    <PersonalInfo initialData={{
+                        username: userData.username,
+                        email: userData.email,
+                        phone: userData.phone,
+                        password: "",
+                        address: userData.address
+                    }}></PersonalInfo>
 
                 </div>
             </div>

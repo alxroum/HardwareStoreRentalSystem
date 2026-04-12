@@ -8,7 +8,7 @@ import { Home } from './Home'
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-async function validateLogin(username, password) {
+export async function validateLogin(username, password) {
     try {
         const response = await fetch("http://localhost:8080/login", {
             method: "POST",
@@ -58,7 +58,7 @@ export function Login() {
 
             if(userData) {
                 localStorage.setItem("LOGGEDIN", true);
-                localStorage.setItem("loggedInUser", JSON.stringify(userData));
+                localStorage.setItem("USER", JSON.stringify(userData));
             } else {
                 localStorage.setItem("LOGGEDIN", false);
             }

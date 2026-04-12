@@ -10,6 +10,7 @@ import { addUser } from './database.js';
 import { getUsers } from './database.js';
 import { getUserByUsername } from './database.js';
 import bcrypt from 'bcrypt';
+import { updateUserBalance } from './database.js';
 
 const app = express()
 
@@ -202,5 +203,43 @@ app.post("/users", async (req, res) => {
     } catch (err) {
         console.error("Error creating user:", err);
         res.status(500).json({ error: "Failed to create user" });
+    }
+});
+
+app.post("/users/:username/funds", async (req, res) => {
+    try {
+        const { action, amount } = req.body; 
+        const parsedAmount = parseFloat(amount);
+
+        // Validation
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            return res.status(400).json({ error: "Amount must be a number > 0" });
+        }
+
+        const user = await getUserByUsername(req.params.username);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        let currentBalance = parseFloat(user.account_balance) || 0;
+
+        if (action === "deposit") {
+            currentBalance += parsedAmount;
+        } else if (action === "withdraw") {
+            if (currentBalance < parsedAmount) {
+                return res.status(400).json({ error: "Insufficient funds." });
+            }
+            currentBalance -= parsedAmount;
+        } else {
+            return res.status(400).json({ error: "Invalid action." });
+        }
+
+        // FIX: Round to 2 decimal places to avoid JS floating point bugs
+        const finalBalance = parseFloat(currentBalance.toFixed(2));
+
+        await updateUserBalance(req.params.username, finalBalance);
+        res.status(200).json({ message: "Success", newBalance: finalBalance });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Transaction failed" });
     }
 });

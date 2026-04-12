@@ -67,8 +67,8 @@ function useUsernames() { // TODO this seems to be working !!!
 
 // this function takes in a string for a new username and checks to make sure 
 // that the username doesn't already exist in the database
-function validateNewUsername(username, usernames) {
-    console.log(usernames); // TODO this is saying usernames is undefined !!!!!
+export function validateNewUsername(username, usernames) {
+    console.log(usernames);
 
     usernames.forEach(element => {
         if(element == username) {

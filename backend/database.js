@@ -147,6 +147,17 @@ export async function getUserByUsername(targetUsername) {
     }
 }
 
+export async function updateUserBalance(targetUsername, newBalance) {
+    try {
+        const query = "UPDATE users SET account_balance = ? WHERE username = ?";
+        await pool.query(query, [newBalance, targetUsername]);
+        return true; 
+    } catch (error) {
+        console.error("Database error updating balance:", error);
+        throw error; 
+    }
+}
+
 //test code
 //const inventory = await getInventory()
 //console.log(inventory)
