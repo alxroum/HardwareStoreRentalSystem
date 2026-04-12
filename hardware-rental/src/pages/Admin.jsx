@@ -1,87 +1,218 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
 import './Admin.css'
 
-// NOTE: THIS IS ALL TEMP TO REPRESENT BACKEND WHEN THE TIME COMES (FAKE DATA)
-// GOAL: CRUD (kinda)
-
-const sampleInventory = [
-    { id: 1, name: "Circular Saw", category: "Power Tools", description: "24V cordless circular saw", total: 5, remaining: 3, dailyRate: 25.00, weeklyRate: 100.00 },
-    { id: 2, name: "Power Washer", category: "Cleaning", description: "2000 PSI electric power washer", total: 3, remaining: 1, dailyRate: 30.00, weeklyRate: 110.00 },
-    { id: 3, name: "Paint Sprayer", category: "Painting", description: "Airless paint sprayer", total: 4, remaining: 4, dailyRate: 35.00, weeklyRate: 140.00 },
-    { id: 4, name: "Chainsaw", category: "Yard and Garden", description: "16 inch gas chainsaw", total: 6, remaining: 2, dailyRate: 30.00, weeklyRate: 120.00 },
-]
-
-const sampleOrders = [
-    { id: 1, userId: 1, username: "john_doe", item: "Circular Saw", dateRented: "2025-02-20", dateDue: "2025-02-27", status: "Active", totalCost: 100.00 },
-    { id: 2, userId: 2, username: "jane_smith", item: "Power Washer", dateRented: "2025-02-18", dateDue: "2025-02-25", status: "Overdue", totalCost: 110.00 },
-    { id: 3, userId: 3, username: "bob_jones", item: "Chainsaw", dateRented: "2025-02-10", dateDue: "2025-02-17", status: "Returned", totalCost: 120.00 },
-]
+// crud: create and read done. Need to do update and delete
+// need to also update fields to consider image, quality, and equipment. (image we might be able to just do a default image, but
+// we do have to handle that with upload or drag and drop.)
+// also still didnt fix scroll yet, only just now realized thats still an issue
 
 export function Admin() {
 
     const [activeTab, setActiveTab] = useState('inventory')
-    const [inventory, setInventory] = useState(sampleInventory)
-    const [orders] = useState(sampleOrders)
+    // removed sample inventory data. We're going to be adding directly into the db now
+    const [inventory, setInventory] = useState([])
+    const [orders] = useState([])
+
+    useEffect(() => {
+        fetch("http://localhost:8080/inventory")
+            .then(res => res.json())
+            .then(data => {
+            const mapped = data.map(item => ({
+                id: item.idinventory,
+                name: item.equipment_name,
+                category: item.category,
+                description: item.equipment_description,
+                total: item.total_equipment,
+                remaining: item.remaining_equipment,
+                dailyRate: item.daily_rate,
+                weeklyRate: item.weekly_rate,
+                image: item.image_icon
+            }))
+            setInventory(mapped)
+         })
+            .catch(err => console.error("Fetch error:", err))
+    }, [])
 
     // state for the add new item formm
     const [newItem, setNewItem] = useState({
-        name: '',
-        category: '',
-        description: '',
-        total: 0,
-        dailyRate: 0,
-        weeklyRate: 0
+    name: '',
+    category: '',
+    description: '',
+    total: 0,
+    dailyRate: 0,
+    weeklyRate: 0,
+    quality: 'Okay',
+    image: null
     })
 
     // tracks which item is being edited (so if its null = we're editing none)
     const [editingId, setEditingId] = useState(null)
     const [editItem, setEditItem] = useState({})
 
+    // validation layer
+
+    const [formErrors, setFormErrors] = useState([])
+
+    function validateItem(item) {
+        const errors = []
+
+        if (!item.name || item.name.trim() === '')
+            errors.push("item name is required.")
+
+        if (!item.category || item.category === '')
+            errors.push("category is required.")
+
+        if (!Number.isInteger(Number(item.total)) || item.total <= 0)
+            errors.push("quantity must be a positive whole number.")
+
+        if (isNaN(item.dailyRate) || item.dailyRate <= 0)
+            errors.push("daily rate must be a positive number.")
+
+        if (isNaN(item.weeklyRate) || item.weeklyRate <= 0)
+            errors.push("weekly rate must be a positive number.")
+
+        if (item.weeklyRate < item.dailyRate)
+            errors.push("weekly rate should be greater than or equal to daily rate.")
+
+        return errors
+    }
+
+
     // inv functions
 
-    // add tool to inv
-    function handleAddItem() {
-        // very basic validation making sure isn't empty
-        if (!newItem.name.trim()) 
-        {
-            alert('Please enter an item name')
+    // add tool to inv. Biggest changes here.
+    const handleAddItem = async () => {
+        const errors = validateItem(newItem)
+        if (errors.length > 0) {
+            setFormErrors(errors)
             return
         }
+        setFormErrors([])
+        const formData = new FormData()
 
-        // this is what we'll change in the future, as the database in the future will handle IDs. 
-        // so im just using fake ones.
-        const item = {
-            id: inventory.length + 1, ...newItem, remaining: newItem.total    
+        formData.append("equipment_name", newItem.name)
+        formData.append("equipment_description", newItem.description)
+        formData.append("category", newItem.category)
+        formData.append("total_equipment", newItem.total)
+        formData.append("remaining_equipment", newItem.total)
+        formData.append("daily_rate", newItem.dailyRate)
+        formData.append("weekly_rate", newItem.weeklyRate)
+        formData.append("quality", newItem.quality)
+
+        if (newItem.image) {
+            formData.append("image", newItem.image)
         }
 
-        // add to the list and clear the form
-        setInventory([...inventory, item])
-        setNewItem({ name: '', category: '', description: '', total: 0, dailyRate: 0, weeklyRate: 0 })
-        console.log('Added item:', item)
-        // future: gotta send to backend. That way it updates.
+        const res = await fetch("http://localhost:8080/inventory", {
+        method: "POST",
+        body: formData
+    })
+
+    const data = await res.json()
+
+    // Ensure these keys match the database column names exactly
+    const mapped = {
+        id: data.idinventory, // check if backend uses 'idinventory'
+        name: data.equipment_name,
+        category: data.category,
+        description: data.equipment_description,
+        total: data.total_equipment,
+        remaining: data.remaining_equipment,
+        dailyRate: data.daily_rate,
+        weeklyRate: data.weekly_rate,
+        image: data.image_icon // This is the key field
     }
 
-    // removal
-    function handleRemoveItem(id) {
-        setInventory(inventory.filter(item => item.id !== id))
-        console.log('Removed item with id:', id)
-        // future: also send to backend
+    setInventory(prev => [...prev, mapped])
+
+        setNewItem({
+            name: '',
+            category: '',
+            description: '',
+            total: 0,
+            dailyRate: 0,
+            weeklyRate: 0,
+            quality: 'Okay',
+            image: null
+        })
     }
 
-    // editing item
+    function handleImageUpload(e) {
+        const file = e.target.files[0]
+        if (!file) return
+
+        setNewItem({
+            ...newItem,
+            image: file
+        })
+    }
+
+    // removal with actual route
+    async function handleRemoveItem(id) {
+        try {
+            await fetch(`http://localhost:8080/inventory/${id}`, {
+                method: "DELETE"
+            })
+
+            setInventory(prev => prev.filter(item => item.id !== id))
+
+            console.log("Deleted item:", id)
+        } catch (err) {
+            console.error("Delete failed:", err)
+        }
+    }
+
+    // editing item (THIS IS NOT UPDATED YET)
     function handleStartEdit(item) {
         setEditingId(item.id)
         setEditItem({ ...item })
     }
 
     // save edited item
-    function handleSaveEdit() {
-        setInventory(inventory.map(item =>
-            item.id === editingId ? editItem : item
-        ))
-        setEditingId(null)
-        console.log('Updated item:', editItem)
-        // future: backend
+    async function handleSaveEdit() {
+        const errors = validateItem(editItem)
+        if (errors.length > 0) {
+            setFormErrors(errors)
+            return
+        }
+        setFormErrors([])
+
+        try {
+            const res = await fetch(`http://localhost:8080/inventory/${editingId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    equipment_name: editItem.name,
+                    equipment_description: editItem.description,
+                    category: editItem.category,
+                    total_equipment: editItem.total,
+                    daily_rate: editItem.dailyRate,
+                    weekly_rate: editItem.weeklyRate,
+                    quality: editItem.quality ?? "Okay"
+                })
+            })
+
+            const data = await res.json()
+
+            const mapped = {
+                id: data.idinventory,
+                name: data.equipment_name,
+                category: data.category,
+                description: data.equipment_description,
+                total: data.total_equipment,
+                remaining: data.remaining_equipment,
+                dailyRate: data.daily_rate,
+                weeklyRate: data.weekly_rate,
+                image: data.image_icon
+            }
+
+            setInventory(prev => prev.map(item => item.id === editingId ? mapped : item))
+            setEditingId(null)
+            setEditItem({})
+        } catch (err) {
+            console.error("Update failed:", err)
+        }
     }
 
     // cancel editing, we should go here in the case to not update the backend on a cancel.
@@ -115,20 +246,26 @@ export function Admin() {
             {/* inv tab */}
             {activeTab === 'inventory' && (
                 <div className="admin-section">
-
+                    
                     {/* add new item form */}
                     <div className="add-item-form">
                         <h3>Add New Item</h3>
+                        {/* r1 name and category */}
                         <div className="form-row">
                             <input
                                 type="text"
                                 placeholder="Item name"
                                 value={newItem.name}
-                                onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, name: e.target.value })
+                                }
                             />
+
                             <select
                                 value={newItem.category}
-                                onChange={(e) => setNewItem({...newItem, category: e.target.value})}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, category: e.target.value })
+                                }
                             >
                                 <option value="">Select Category</option>
                                 <option value="Power Tools">Power Tools</option>
@@ -140,34 +277,84 @@ export function Admin() {
                                 <option value="Demolition">Demolition</option>
                             </select>
                         </div>
+
+                        {/* r2 quality and img */}
+                        <div className="form-row">
+                            <select
+                                value={newItem.quality}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, quality: e.target.value })
+                                }
+                            >
+                                <option value="Okay">Okay</option>
+                                <option value="Good">Good</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="New">New</option>
+                            </select>
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageUpload(e)}
+                                />
+                            </div>
+
+                        {/* r3 description */}
                         <div className="form-row">
                             <input
                                 type="text"
                                 placeholder="Description"
                                 value={newItem.description}
-                                onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                                onChange={(e) =>
+                                    setNewItem({ ...newItem, description: e.target.value })
+                                }
                             />
                         </div>
+
+                        {/* r4 quantity and rates */}
                         <div className="form-row">
                             <input
                                 type="number"
                                 placeholder="Quantity"
+                                min="1"
                                 value={newItem.total || ''}
-                                onChange={(e) => setNewItem({...newItem, total: parseInt(e.target.value) || 0})}
+                                onChange={(e) => setNewItem({
+                                    ...newItem,
+                                    total: parseInt(e.target.value) || 0
+                                })}
                             />
+
                             <input
                                 type="number"
                                 placeholder="Daily rate"
                                 value={newItem.dailyRate || ''}
-                                onChange={(e) => setNewItem({...newItem, dailyRate: parseFloat(e.target.value) || 0})}
+                                onChange={(e) =>
+                                    setNewItem({
+                                        ...newItem,
+                                        dailyRate: parseFloat(e.target.value) || 0
+                                    })
+                                }
                             />
+
                             <input
                                 type="number"
                                 placeholder="Weekly rate"
                                 value={newItem.weeklyRate || ''}
-                                onChange={(e) => setNewItem({...newItem, weeklyRate: parseFloat(e.target.value) || 0})}
+                                onChange={(e) =>
+                                    setNewItem({
+                                        ...newItem,
+                                        weeklyRate: parseFloat(e.target.value) || 0
+                                    })
+                                }
                             />
                         </div>
+                        {formErrors.length > 0 && (
+                        <div className="form-errors">
+                             {formErrors.map((err, i) => (
+                                <p key={i}>Invalid: {err}</p>
+                            ))}
+                        </div>
+                        )}
                         <button className="add-button" onClick={handleAddItem}>Add Item</button>
                     </div>
 
@@ -175,6 +362,7 @@ export function Admin() {
                     <table className="admin-table">
                         <thead>
                             <tr>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Category</th>
                                 <th>Total</th>
@@ -188,14 +376,40 @@ export function Admin() {
                             {inventory.map(item => (
                                 <tr key={item.id}>
                                     {editingId === item.id ? (
-                                        <>
-                                            {/* edint fields */}
-                                            <td><input value={editItem.name} onChange={(e) => setEditItem({...editItem, name: e.target.value})}/></td>
-                                            <td><input value={editItem.category} onChange={(e) => setEditItem({...editItem, category: e.target.value})}/></td>
-                                            <td><input type="number" value={editItem.total} onChange={(e) => setEditItem({...editItem, total: parseInt(e.target.value) || 0})}/></td>
+                                    <>
+                                            {/* image cell - not editable, just show current */}
+                                            <td>
+                                                {item.image ? (
+                                                    <img
+                                                        src={`http://localhost:8080${item.image}`}
+                                                        alt="item"
+                                                        style={{ width: 60 }}
+                                                    />
+                                                ) : (
+                                                    <span>No Image</span>
+                                                )}
+                                            </td>
+                                            {/* edit fields */}
+                                            <td><input value={editItem.name ?? ''} onChange={(e) => setEditItem({...editItem, name: e.target.value})}/></td>
+                                            <td> {/* this creates our dropdown. If we want more add here for the ufuture. */}
+                                                <select
+                                                    value={editItem.category ?? ''}
+                                                    onChange={(e) => setEditItem({...editItem, category: e.target.value})}
+                                                >
+                                                    <option value="">Select Category</option>
+                                                    <option value="Power Tools">Power Tools</option>
+                                                    <option value="Cleaning">Cleaning</option>
+                                                    <option value="Painting">Painting</option>
+                                                    <option value="Yard and Garden">Yard and Garden</option>
+                                                    <option value="Masonry">Masonry</option>
+                                                    <option value="Access">Access</option>
+                                                    <option value="Demolition">Demolition</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="number" value={editItem.total ?? 0} onChange={(e) => setEditItem({...editItem, total: parseInt(e.target.value) || 0})}/></td>
                                             <td>{item.remaining}</td>
-                                            <td><input type="number" value={editItem.dailyRate} onChange={(e) => setEditItem({...editItem, dailyRate: parseFloat(e.target.value) || 0})}/></td>
-                                            <td><input type="number" value={editItem.weeklyRate} onChange={(e) => setEditItem({...editItem, weeklyRate: parseFloat(e.target.value) || 0})}/></td>
+                                            <td><input type="number" value={editItem.dailyRate ?? 0} onChange={(e) => setEditItem({...editItem, dailyRate: parseFloat(e.target.value) || 0})}/></td>
+                                            <td><input type="number" value={editItem.weeklyRate ?? 0} onChange={(e) => setEditItem({...editItem, weeklyRate: parseFloat(e.target.value) || 0})}/></td>
                                             <td>
                                                 <button className="save-button" onClick={handleSaveEdit}>Save</button>
                                                 <button className="cancel-button" onClick={handleCancelEdit}>Cancel</button>
@@ -204,6 +418,17 @@ export function Admin() {
                                     ) : (
                                         <>
                                             {/* display mode */}
+                                             <td>
+                                                {item.image ? (
+                                                    <img
+                                                    src={`http://localhost:8080${item.image}`}
+                                                    alt="item"
+                                                    style={{ width: 150 }}
+                                                    />
+                                                ) : (
+                                                    <span>No Image</span>
+                                                )}
+                                                </td>
                                             <td>{item.name}</td>
                                             <td>{item.category}</td>
                                             <td>{item.total}</td>
@@ -223,7 +448,7 @@ export function Admin() {
                 </div>
             )}
 
-            {/* order trab  */}
+            {/* order tab  */}
             {activeTab === 'orders' && (
                 <div className="admin-section">
                     <h3>Customer Orders</h3>
@@ -247,7 +472,6 @@ export function Admin() {
                                     <td>{order.item}</td>
                                     <td>{order.dateRented}</td>
                                     <td>{order.dateDue}</td>
-                                    {/* color coding status */}
                                     <td className={`status-${order.status.toLowerCase()}`}>{order.status}</td>
                                     <td>${order.totalCost.toFixed(2)}</td>
                                 </tr>
