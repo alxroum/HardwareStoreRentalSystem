@@ -57,7 +57,7 @@ export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm })
                       <div className="co-item-meta">
                         {item.duration === '7'  ? '1 week'
                          : item.duration === '30' ? '1 month'
-                         : `${item.duration} day${item.duration > 1 ? 's' : ''}`}
+                         : `${item.duration} day${parseInt(item.duration) > 1 ? 's' : ''}`}
                         {item.qty > 1 && ` · qty ${item.qty}`}
                       </div>
                     </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import './Cart.css';
 import { Checkout } from './Checkout';
@@ -19,9 +18,13 @@ export function Cart() {
       })
       .then(data => {
         const withDefaults = data.map(item => ({
-          ...item,
-          qty: item.qty ?? 1,
-          duration: item.duration ?? '1',
+          id:        item.idinventory,
+          name:      item.equipment_name,
+          category:  item.category,
+          dailyRate: Number(item.daily_rate),
+          deposit:   Number(item.daily_rate) * 2, // 2× daily rate — adjust multiplier as needed
+          qty:       1,
+          duration:  '1',
         }));
         setItems(withDefaults);
       })
