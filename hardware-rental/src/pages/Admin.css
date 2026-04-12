@@ -54,6 +54,22 @@
     margin-bottom: 20px;
 }
 
+/*error stuff*/
+.form-errors {
+    background: #fff0f0;
+    border: 2px solid #e74c3c;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 10px;
+}
+
+.form-errors p {
+    color: #e74c3c;
+    margin: 4px 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 /* tab stuff */
 .admin-tabs {
     display: flex;
