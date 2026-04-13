@@ -104,9 +104,14 @@ app.delete("/inventory/:id", async (req, res) => {
     }
 })
 
+// 404 handler - must be before error handler
+app.use((req, res) => {
+    res.status(404).json({ error: "Endpoint not found" })
+})
+
 app.use((err, req, res, next) => {
     console.error(err.stack)
-    res.status(500).send('something broke')
+    res.status(500).json({ error: "Internal server error" })
 })
 
 app.listen(8080, () =>{
@@ -208,7 +213,7 @@ app.post("/users", async (req, res) => {
 
 app.post("/users/:username/funds", async (req, res) => {
     try {
-        const { action, amount } = req.body; 
+        const { action, amount } = req.body;
         const parsedAmount = parseFloat(amount);
 
         // Validation
@@ -241,5 +246,51 @@ app.post("/users/:username/funds", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Transaction failed" });
+    }
+});
+
+// Checkout endpoint - processes rental order and deducts funds from user account
+app.post("/checkout", async (req, res) => {
+    try {
+        const { username, total } = req.body;
+
+        // Validation
+        if (!username) {
+            return res.status(400).json({ error: "Username is required" });
+        }
+
+        const parsedTotal = parseFloat(total);
+        if (isNaN(parsedTotal) || parsedTotal <= 0) {
+            return res.status(400).json({ error: "Total must be a valid amount" });
+        }
+
+        // Get user and validate balance
+        const user = await getUserByUsername(username);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const currentBalance = parseFloat(user.account_balance) || 0;
+        if (currentBalance < parsedTotal) {
+            return res.status(400).json({
+                error: "Insufficient balance",
+                shortBy: (parsedTotal - currentBalance).toFixed(2)
+            });
+        }
+
+        // Deduct funds from user account
+        const newBalance = parseFloat((currentBalance - parsedTotal).toFixed(2));
+        await updateUserBalance(username, newBalance);
+
+        // Return success with updated balance
+        res.status(200).json({
+            message: "Order placed successfully",
+            newBalance: newBalance,
+            amountCharged: parsedTotal
+        });
+
+    } catch (err) {
+        console.error("Checkout error:", err);
+        res.status(500).json({ error: "Checkout failed" });
     }
 });

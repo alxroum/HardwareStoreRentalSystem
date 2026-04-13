@@ -19,7 +19,7 @@ export function Card({
 
     return (
         <div id={c_id} className="card">
-            <div className='top-half'>
+            <div className='top-half' onClick={onCardClick}>
                 {/* had to swap image rendering to backend rendering */}
                 <img 
                     className="item-image" 
@@ -42,8 +42,8 @@ export function Card({
                         ${weekly_rate.toFixed(2)}
                     </div>
                 </div>
-                <button className="reserve-button">Reserve Now</button>
-                <button className="cart-button">Add to Cart</button>
+                <button className="reserve-button" onClick={onReserveButton}>Reserve Now</button>
+                <button className="cart-button" onClick={onCartButton}>Add to Cart</button>
             </div>
         </div>
     )

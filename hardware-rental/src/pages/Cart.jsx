@@ -2,34 +2,43 @@ import { useState, useEffect } from 'react';
 import './Cart.css';
 import { Checkout } from './Checkout';
 
-const ACCOUNT_BALANCE = 124.50;
-
 export function Cart() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [accountBalance, setAccountBalance] = useState(0);
 
   useEffect(() => {
-    fetch('http://localhost:8080/inventory')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch inventory');
-        return res.json();
-      })
-      .then(data => {
-        const withDefaults = data.map(item => ({
-          id:        item.idinventory,
-          name:      item.equipment_name,
-          category:  item.category,
-          dailyRate: Number(item.daily_rate),
-          deposit:   Number(item.daily_rate) * 2, // 2× daily rate — adjust multiplier as needed
-          qty:       1,
-          duration:  '1',
-        }));
-        setItems(withDefaults);
-      })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
+    // Get current user from localStorage
+    const userJSON = localStorage.getItem("USER");
+    if (userJSON) {
+      try {
+        const user = JSON.parse(userJSON);
+        setCurrentUser(user);
+        setAccountBalance(parseFloat(user.account_balance) || 0);
+      } catch (err) {
+        console.error("Error parsing user data:", err);
+        setError("Session error: could not load user data");
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Load cart items from localStorage
+    const cartJSON = localStorage.getItem("CART");
+    if (cartJSON) {
+      try {
+        const cartItems = JSON.parse(cartJSON);
+        setItems(cartItems);
+      } catch (err) {
+        console.error("Error parsing cart data:", err);
+        setItems([]);
+      }
+    }
+
+    setLoading(false);
   }, []);
 
   const getRate = (item) => item.dailyRate * parseInt(item.duration);
@@ -39,22 +48,39 @@ export function Cart() {
   const delivery = 15;
   const total    = subtotal + deposit + delivery;
 
-  const updateQty = (id, delta) =>
-    setItems(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
+  const updateQty = (id, delta) => {
+    setItems(prev => {
+      const updated = prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i);
+      localStorage.setItem("CART", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-  const updateDuration = (id, duration) =>
-    setItems(prev => prev.map(i => i.id === id ? { ...i, duration } : i));
+  const updateDuration = (id, duration) => {
+    setItems(prev => {
+      const updated = prev.map(i => i.id === id ? { ...i, duration } : i);
+      localStorage.setItem("CART", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-  const removeItem = (id) =>
-    setItems(prev => prev.filter(i => i.id !== id));
+  const removeItem = (id) => {
+    setItems(prev => {
+      const updated = prev.filter(i => i.id !== id);
+      localStorage.setItem("CART", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const handleOrderConfirmed = () => {
     setItems([]);
+    localStorage.removeItem("CART");
     setShowCheckout(false);
   };
 
   if (loading) return <div className="cart-page"><p style={{ textAlign: 'center' }}>Loading cart...</p></div>;
   if (error)   return <div className="cart-page"><p style={{ textAlign: 'center', color: 'red' }}>Error: {error}</p></div>;
+  if (!currentUser) return <div className="cart-page"><p style={{ textAlign: 'center' }}>Please <a href="#/login">log in</a> to view your cart.</p></div>;
 
   return (
     <div className="cart-page">
@@ -153,7 +179,8 @@ export function Cart() {
       {showCheckout && (
         <Checkout
           items={items}
-          accountBalance={ACCOUNT_BALANCE}
+          accountBalance={accountBalance}
+          username={currentUser?.username}
           onClose={() => setShowCheckout(false)}
           onConfirm={handleOrderConfirmed}
         />

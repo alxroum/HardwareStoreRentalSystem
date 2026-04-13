@@ -41,7 +41,42 @@ export function Home() {
     const tools = grabToolData(); // call the grab function that sits in App.jsx
 
     const [selectedTool, setSelectedTool] = useState(null); // holds the tool that has been selected for the detailed popup
-    
+
+    const addToCart = (tool) => {
+        const cartItem = {
+            id: tool.idinventory,
+            name: tool.equipment_name,
+            category: tool.category,
+            dailyRate: Number(tool.daily_rate),
+            deposit: Number(tool.daily_rate) * 2,
+            qty: 1,
+            duration: '1'
+        };
+
+        // Get existing cart from localStorage
+        const cartJSON = localStorage.getItem("CART");
+        let cart = [];
+        if (cartJSON) {
+            try {
+                cart = JSON.parse(cartJSON);
+            } catch (err) {
+                console.error("Error parsing cart:", err);
+            }
+        }
+
+        // Check if item already in cart
+        const existingItem = cart.find(item => item.id === cartItem.id);
+        if (existingItem) {
+            existingItem.qty += 1;
+        } else {
+            cart.push(cartItem);
+        }
+
+        // Save back to localStorage
+        localStorage.setItem("CART", JSON.stringify(cart));
+        alert(`${tool.equipment_name} added to cart!`);
+    };
+
     const toggleExpanded = () => {
         setExpanded(!expanded);
     };
@@ -56,7 +91,12 @@ export function Home() {
 
         return (
             filteredTools.map(tool => ( // map the data from a filtered list of tools into a card with each variable set
-                <Card key={tool.id} onCardClick={() => setSelectedTool(tool)} {...tool} />
+                <Card
+                    key={tool.idinventory}
+                    onCardClick={() => setSelectedTool(tool)}
+                    onCartButton={() => addToCart(tool)}
+                    {...tool}
+                />
             ))
         )
     }

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import './Checkout.css';
 
-export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm }) {
+export function Checkout({ items, accountBalance = 0, username, onClose, onConfirm }) {
   const [status, setStatus] = useState('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const getRate = (item) => item.dailyRate * parseInt(item.duration);
   const subtotal = items.reduce((s, i) => s + getRate(i) * i.qty, 0);
@@ -14,11 +15,55 @@ export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm })
 
   const handleConfirm = async () => {
     setStatus('processing');
+    setErrorMessage('');
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1400));
+      if (!username) {
+        throw new Error('User not logged in');
+      }
+
+      const response = await fetch('http://localhost:8080/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          total: total.toFixed(2)
+        })
+      });
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        console.error('Failed to parse response:', parseErr);
+        console.error('Response status:', response.status);
+        const text = await response.text();
+        console.error('Response text:', text);
+        throw new Error(`Invalid response from server: ${text}`);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || `Server error: ${response.status}`);
+      }
+
       setStatus('success');
+
+      // Update localStorage with new balance
+      try {
+        const userJSON = localStorage.getItem('USER');
+        if (userJSON) {
+          const user = JSON.parse(userJSON);
+          user.account_balance = data.newBalance;
+          localStorage.setItem('USER', JSON.stringify(user));
+        }
+      } catch (parseErr) {
+        console.error('Error updating localStorage:', parseErr);
+      }
+
       if (onConfirm) onConfirm({ paymentMethod: 'balance', total });
-    } catch {
+    } catch (err) {
+      console.error('Checkout error:', err);
+      setErrorMessage(err.message || 'Something went wrong');
       setStatus('error');
     }
   };
@@ -26,7 +71,7 @@ export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm })
   const confirmLabel = () => {
     if (status === 'processing') return 'Processing…';
     if (status === 'success')    return '✓ Order placed!';
-    if (status === 'error')      return 'Something went wrong — try again';
+    if (status === 'error')      return 'Try again';
     if (!canPay)                 return 'Insufficient balance';
     return 'Confirm & place order';
   };
@@ -89,6 +134,11 @@ export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm })
               <div className="co-balance-warning">
                 Balance is ${(total - accountBalance).toFixed(2)} short.{' '}
                 <button className="co-balance-add-link">Add funds →</button>
+              </div>
+            )}
+            {errorMessage && (
+              <div className="co-balance-warning" style={{ color: '#d32f2f' }}>
+                {errorMessage}
               </div>
             )}
           </div>
