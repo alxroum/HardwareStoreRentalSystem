@@ -9,6 +9,10 @@ import './Admin.css'
 
 export function Admin() {
 
+    // Reload user balance from localStorage to reflect the updated balance from checkout
+    const userJSON = localStorage.getItem("USER");
+    const user = JSON.parse(userJSON);
+     
     const [activeTab, setActiveTab] = useState('inventory')
     // removed sample inventory data. We're going to be adding directly into the db now
     const [inventory, setInventory] = useState([])
@@ -223,7 +227,7 @@ export function Admin() {
 
     
     // rendering
-    return (
+    return (user != null && user.username == "admin" && (
         <div className="admin-page">
             <h1>Admin Dashboard</h1>
 
@@ -482,4 +486,4 @@ export function Admin() {
             )}
         </div>
     )
-}
+)}
