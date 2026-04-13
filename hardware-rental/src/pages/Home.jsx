@@ -31,7 +31,13 @@ import '../styles/App.css'
 export function Home() {
 
     const [category, setCategory] = useState("ALL");
-    
+        
+    useEffect(() => {
+            document.body.classList.add('home-page')
+            return () => document.body.classList.remove('home-page')
+        }, [])
+
+
     const tools = grabToolData(); // call the grab function that sits in App.jsx
 
     const [selectedTool, setSelectedTool] = useState(null); // holds the tool that has been selected for the detailed popup

@@ -120,11 +120,16 @@ nav {
   font-weight: 500;
 }
 
+/*had to do it this way because it removed scrolling for admin. This feeds
+into home.jsx using an effect*/
+body.home-page {
+  overflow: hidden;
+}
+
 /*Alex Morris added this to get rid of the two scroll bars*/
 body {
   margin: 0;
   height: 100vh;
-  overflow: hidden;
 }
 
 .category-selector:hover {
