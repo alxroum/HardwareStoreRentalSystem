@@ -11,6 +11,7 @@ import { getUsers } from './database.js';
 import { getUserByUsername } from './database.js';
 import bcrypt from 'bcrypt';
 import { updateUserBalance } from './database.js';
+import { processCheckoutData } from './database.js';
 
 const app = express()
 
@@ -102,20 +103,6 @@ app.delete("/inventory/:id", async (req, res) => {
         console.error(err)
         res.status(500).json({ error: "Delete failed" })
     }
-})
-
-// 404 handler - must be before error handler
-app.use((req, res) => {
-    res.status(404).json({ error: "Endpoint not found" })
-})
-
-app.use((err, req, res, next) => {
-    console.error(err.stack)
-    res.status(500).json({ error: "Internal server error" })
-})
-
-app.listen(8080, () =>{
-    console.log('Server is running on port 8080')
 })
 
 // get list of usernames
@@ -250,47 +237,41 @@ app.post("/users/:username/funds", async (req, res) => {
 });
 
 // Checkout endpoint - processes rental order and deducts funds from user account
-app.post("/checkout", async (req, res) => {
-    try {
-        const { username, total } = req.body;
+app.post('/checkout', async (req, res) => {
+  const { username, total } = req.body;
 
-        // Validation
-        if (!username) {
-            return res.status(400).json({ error: "Username is required" });
-        }
+  try {
+    // call your separated database function
+    const result = await processCheckoutData(username, total);
 
-        const parsedTotal = parseFloat(total);
-        if (isNaN(parsedTotal) || parsedTotal <= 0) {
-            return res.status(400).json({ error: "Total must be a valid amount" });
-        }
+    // if it succeeds, send the formatted JSON back to React
+    res.status(200).json(result);
 
-        // Get user and validate balance
-        const user = await getUserByUsername(username);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
+  } catch (error) {
+    // catch errors and send the appropriate HTTP status code
+    console.error('Checkout routing error:', error);
+    
+    // check if we threw a specific error (like 404 or 400), otherwise default to 500
+    const statusCode = error.statusCode || 500;
+    const message = statusCode === 500 
+      ? 'Failed to process checkout in the database' 
+      : error.message;
 
-        const currentBalance = parseFloat(user.account_balance) || 0;
-        if (currentBalance < parsedTotal) {
-            return res.status(400).json({
-                error: "Insufficient balance",
-                shortBy: (parsedTotal - currentBalance).toFixed(2)
-            });
-        }
-
-        // Deduct funds from user account
-        const newBalance = parseFloat((currentBalance - parsedTotal).toFixed(2));
-        await updateUserBalance(username, newBalance);
-
-        // Return success with updated balance
-        res.status(200).json({
-            message: "Order placed successfully",
-            newBalance: newBalance,
-            amountCharged: parsedTotal
-        });
-
-    } catch (err) {
-        console.error("Checkout error:", err);
-        res.status(500).json({ error: "Checkout failed" });
-    }
+    res.status(statusCode).json({ error: message });
+  }
 });
+
+// 404 handler - must be after all routes
+app.use((req, res) => {
+    res.status(404).json({ error: "Endpoint not found" })
+})
+
+// error handler - must be last
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).json({ error: "Internal server error" })
+})
+
+app.listen(8080, () =>{
+    console.log('Server is running on port 8080')
+})

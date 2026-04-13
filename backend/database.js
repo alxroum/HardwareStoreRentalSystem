@@ -158,6 +158,64 @@ export async function updateUserBalance(targetUsername, newBalance) {
     }
 }
 
+export async function processCheckoutData(username, total) {
+  // fetch user data
+  const [userRows] = await pool.query(
+    'SELECT idusers, account_balance FROM users WHERE username = ?', 
+    [username]
+  );
+
+  if (userRows.length === 0) {
+    // attach a status code to the error so the route knows how to respond
+    const error = new Error('User not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const userId = userRows[0].idusers;
+  const currentBalance = parseFloat(userRows[0].account_balance);
+  const checkoutTotal = parseFloat(total);
+
+  // verify balance
+  if (currentBalance < checkoutTotal) {
+    const error = new Error('Insufficient balance');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const newBalance = currentBalance - checkoutTotal;
+
+  // default values
+  const dateRented = new Date(); 
+  const dateDue = new Date();
+  dateDue.setDate(dateRented.getDate() + 7); 
+  
+  const dateReturned = null;
+  const lateFee = 0.00;      
+  const status = 'active';   
+
+  // insert new order
+  const [insertResult] = await pool.query(
+    `INSERT INTO orders 
+    (idusers, \`date-rented\`, date_due, date_returned, late_fee, status, total_cost) 
+    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [userId, dateRented, dateDue, dateReturned, lateFee, status, checkoutTotal]
+  );
+
+  // update users balance
+  await pool.query(
+    'UPDATE users SET account_balance = ? WHERE idusers = ?',
+    [newBalance, userId]
+  );
+
+  // return to express route
+  return {
+    success: true,
+    orderId: insertResult.insertId,
+    newBalance: newBalance 
+  };
+}
+
 //test code
 //const inventory = await getInventory()
 //console.log(inventory)

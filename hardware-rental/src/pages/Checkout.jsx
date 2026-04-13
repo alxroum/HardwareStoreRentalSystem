@@ -18,10 +18,6 @@ export function Checkout({ items, accountBalance = 0, username, onClose, onConfi
     setErrorMessage('');
 
     try {
-      if (!username) {
-        throw new Error('User not logged in');
-      }
-
       const response = await fetch('http://localhost:8080/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -31,24 +27,22 @@ export function Checkout({ items, accountBalance = 0, username, onClose, onConfi
         })
       });
 
+      // 1. Check if the response was successful FIRST
+      if (!response.ok) {
+        // If it's a 404, 500, etc., stop here.
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      // 2. Only parse JSON if we know the response was successful
       let data;
       try {
         data = await response.json();
       } catch (parseErr) {
         console.error('Failed to parse response:', parseErr);
-        console.error('Response status:', response.status);
-        const text = await response.text();
-        console.error('Response text:', text);
-        throw new Error(`Invalid response from server: ${text}`);
+        throw new Error('Invalid JSON response from server');
       }
 
-      if (!response.ok) {
-        throw new Error(data.error || `Server error: ${response.status}`);
-      }
-
-      setStatus('success');
-
-      // Update localStorage with new balance
+      // 3. Update localStorage with new balance
       try {
         const userJSON = localStorage.getItem('USER');
         if (userJSON) {
@@ -56,11 +50,17 @@ export function Checkout({ items, accountBalance = 0, username, onClose, onConfi
           user.account_balance = data.newBalance;
           localStorage.setItem('USER', JSON.stringify(user));
         }
-      } catch (parseErr) {
-        console.error('Error updating localStorage:', parseErr);
+      } catch (storageErr) {
+        console.error('Error updating localStorage:', storageErr);
+        // Don't throw here - checkout was successful, just log the error
       }
 
-      if (onConfirm) onConfirm({ paymentMethod: 'balance', total });
+      setStatus('success');
+
+      // 4. Call the success callback to clear cart and close modal
+      if (onConfirm) {
+        onConfirm({ paymentMethod: 'balance', total, orderId: data.orderId });
+      }
     } catch (err) {
       console.error('Checkout error:', err);
       setErrorMessage(err.message || 'Something went wrong');

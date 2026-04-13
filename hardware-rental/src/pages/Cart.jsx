@@ -75,6 +75,18 @@ export function Cart() {
   const handleOrderConfirmed = () => {
     setItems([]);
     localStorage.removeItem("CART");
+
+    // Reload user balance from localStorage to reflect the updated balance from checkout
+    const userJSON = localStorage.getItem("USER");
+    if (userJSON) {
+      try {
+        const user = JSON.parse(userJSON);
+        setAccountBalance(parseFloat(user.account_balance) || 0);
+      } catch (err) {
+        console.error("Error reloading user balance:", err);
+      }
+    }
+
     setShowCheckout(false);
   };
 
