@@ -6,6 +6,80 @@ import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Login } from './Login'
+import { useEffect } from 'react';
+
+// this function takes in the inputs from the sign up form and passes them into the database
+async function registerUser(username, email, password, phone, address) {
+    try {
+        const response = await fetch("http://localhost:8080/users", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username, 
+                email, 
+                password, 
+                phone, 
+                address
+            })
+        });
+
+        // 1. Explicitly check if the server returned a bad status code (400, 500, etc.)
+        if (!response.ok) {
+            const errorData = await response.json();
+            // Throw an error to jump straight to the catch block
+            throw new Error(errorData.error || "Failed to register. Please try again.");
+        }
+
+        // 2. If response.ok is true, parse the successful data
+        const data = await response.json();
+        console.log("User created successfully:", data);
+        
+        // Do something on success, like redirect to login page
+        return data;
+
+    } catch (error) {
+        // 3. Handle both network errors and the backend errors we threw above
+        console.error("Registration error:", error.message);
+        
+        // Display this error to the user in your UI
+        alert(error.message); 
+    }
+}
+
+// this function grabs a list of all the usernames in the users database table
+function useUsernames() { // TODO this seems to be working !!!
+
+    const [usernames, setUsernames] = useState([]);
+
+    useEffect(() => { // fetch the tool data from the database
+        fetch("http://localhost:8080/usernames")
+            .then(res => res.json()) // display response
+            .then(data => { // grab data
+                const names = data.map(user => user.username);
+                setUsernames(names);
+            })
+            .catch(err => console.error("Error fetching usernames:", err))
+        }, [])
+    return usernames;
+}
+
+// this function takes in a string for a new username and checks to make sure 
+// that the username doesn't already exist in the database
+export function validateNewUsername(username, usernames) {
+    console.log(usernames);
+
+    usernames.forEach(element => {
+        if(element == username) {
+            console.error("Username already exists.")
+            return false;
+        }
+    });
+
+    return true;
+}
+
 
 /* Primary Function: */
 export function SignUp() {
@@ -18,6 +92,7 @@ export function SignUp() {
     const [password, setPassword] = useState("");
     const [confirmpassword, setConfirmPassword] = useState("");
     const returnToLogin = useNavigate();
+    const returnToSignup = useNavigate();
     const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let hasEmptyInput = true;
@@ -27,8 +102,11 @@ export function SignUp() {
     let emailValidated = false;
     let phoneNumberValidated = false;
 
+    const fetchedUsernames = useUsernames();
+    console.log("USERNAMES2: " + fetchedUsernames);
+
     /* Gathers Account Information: */
-    function createAccount() {
+    async function createAccount() {
         /* Debug stuff: */
        /*
         console.log("Username: ", username);
@@ -63,8 +141,14 @@ export function SignUp() {
             
                         /* Backend account creation should be performed here. */
 
-                        /* Brings the user back to the login page: */
-                        returnToLogin("/Login");
+                        console.log("HAS TO BE HERE: ", fetchedUsernames);
+                        if(validateNewUsername(username, fetchedUsernames)) { 
+                            registerUser(username, email, password, phone, address) 
+                            /* Brings the user back to the login page: */
+                            returnToLogin("/login");
+                        } else {
+                            returnToSignup("/signup")
+                        }
                     }
                     else {
                         console.log("Password verification value is false.");

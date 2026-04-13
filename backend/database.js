@@ -101,6 +101,63 @@ export async function deleteInventoryItem(id) {
     return result
 }
 
+export async function getUsernames() {
+    const [rows] = await pool.query("SELECT username FROM users");
+    return rows;
+}
+
+export async function getUsers() {
+    const [rows] = await pool.query("SELECT * FROM `hardware_rental`.`inventory`");
+
+    return rows;
+}
+
+export async function addUser({ username, email, phone, address, password, account_balance = 0 }) {
+    const [result] = await pool.query(
+        'INSERT INTO users (username, email, phone, address, password, account_balance) VALUES (?, ?, ?, ?, ?, ?)',
+        [username, email, phone, address, password, account_balance]
+    );
+
+    const [rows] = await pool.query(
+        'SELECT * FROM users WHERE idusers = ?', [result.insertId]
+    );
+
+    return rows[0];
+}
+
+// grabs user data by a username
+export async function getUserByUsername(targetUsername) {
+    try {
+        const query = "SELECT * FROM users WHERE username = ?";
+        
+        // Execute the query
+        const [rows] = await pool.query(query, [targetUsername]);
+
+        // if there are no results, the user doesn't exist
+        if (rows.length === 0) {
+            return null;
+        }
+
+        // return the first user object
+        return rows[0];
+
+    } catch (error) {
+        console.error("Database error fetching user by username:", error);
+        throw error; // Throw the error so your server.js catch block can handle it
+    }
+}
+
+export async function updateUserBalance(targetUsername, newBalance) {
+    try {
+        const query = "UPDATE users SET account_balance = ? WHERE username = ?";
+        await pool.query(query, [newBalance, targetUsername]);
+        return true; 
+    } catch (error) {
+        console.error("Database error updating balance:", error);
+        throw error; 
+    }
+}
+
 //test code
 //const inventory = await getInventory()
 //console.log(inventory)

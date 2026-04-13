@@ -151,6 +151,18 @@
 }
 
 .btn-add:hover { opacity: 0.9; }
+
+#btn-input {
+  background: rgb(215, 140, 0);
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
 .btn-withdraw {
   background: rgb(215, 140, 0);
   color: white;
@@ -201,4 +213,114 @@
 .account-group { /* group */
     font-size: x-large;
     font-weight: 700;
+}
+
+/* Personal Info Component */
+
+#pi-root * { box-sizing: border-box; margin: 0; padding: 0; }
+
+#pi-card {
+  border-radius: 30px;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 5px 5px rgb(218, 218, 218);
+  margin-top: 30px;
+}
+
+#pi-header {
+  padding: 18px 28px 16px;
+  border-bottom: 1.5px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#pi-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--gray-dark);
+}
+
+#pi-body { padding: 24px 28px; }
+
+#pi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+#pi-username,
+#pi-email,
+#pi-phone,
+#pi-password,
+#pi-address {
+  background-color: rgb(237, 237, 237);
+  padding: 8px;
+  border-radius: 12px;
+}
+
+/* Individual field wrappers — use IDs for unique fields */
+#pi-field-username,
+#pi-field-email,
+#pi-field-phone,
+#pi-field-password,
+#pi-field-address {
+  display: flex;
+  flex-direction: column;
+}
+
+#pi-field-username label,
+#pi-field-email label,
+#pi-field-phone label,
+#pi-field-password label,
+#pi-field-address label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gray-mid);
+  margin-bottom: 6px;
+}
+
+#pi-field-username input,
+#pi-field-email input,
+#pi-field-phone input,
+#pi-field-password input,
+#pi-field-address input {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Barlow', sans-serif;
+  color: var(--gray-dark);
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#pi-field-username input:focus,
+#pi-field-email input:focus,
+#pi-field-phone input:focus,
+#pi-field-password input:focus,
+#pi-field-address input:focus {
+  border-color: var(--orange);
+  background: white;
+}
+
+#pi-field-username input:disabled,
+#pi-field-email input:disabled,
+#pi-field-phone input:disabled,
+#pi-field-password input:disabled,
+#pi-field-address input:disabled {
+  cursor: default;
+  background: var(--bg);
+}
+
+#pi-field-password input[type="password"] {
+  letter-spacing: 3px;
+  font-size: 18px;
 }

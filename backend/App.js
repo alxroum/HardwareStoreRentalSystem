@@ -5,11 +5,18 @@ import{getInventory} from './database.js'
 import {addInventoryItem} from "./database.js"
 import { deleteInventoryItem } from "./database.js"
 import { updateInventoryItem } from "./database.js"
+import { getUsernames } from './database.js'
+import { addUser } from './database.js';
+import { getUsers } from './database.js';
+import { getUserByUsername } from './database.js';
+import bcrypt from 'bcrypt';
+import { updateUserBalance } from './database.js';
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+
 
 const storage = multer.diskStorage({
   destination: "uploads/",
@@ -106,3 +113,133 @@ app.listen(8080, () =>{
     console.log('Server is running on port 8080')
 })
 
+// get list of usernames
+app.get("/usernames", async (req, res) => {
+
+    try {
+        const ids = await getUsernames();
+        res.json(ids);
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: "Failed to grab usernames" })
+    }
+});
+
+// get all user data
+app.get("/users", async (req, res) => {
+    try {
+        const allUsers = await getUsers(); // Your DB function to get everything
+        
+        // Security check: remove passwords before sending
+        const safeUsers = allUsers.map(user => {
+            const { password, ...safeData } = user;
+            return safeData;
+        });
+
+        res.json(safeUsers);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch all users" });
+    }
+})
+
+// use POST to validate credentials for security
+// GET moves the data to the localhost url and passwords are exposed
+app.post("/login", async (req, res) => {
+    try {
+        // retrieve the username and password from the request
+        const { username, password } = req.body;
+
+        // 
+        const user = await getUserByUsername(username); 
+
+        // check if the user exists
+        if (!user) {
+            // bad login
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+
+        // if everything matches, remove the password and send everything back
+        const { password: userPassword, ...safeUserData } = user;
+        
+        res.status(200).json({ 
+            message: "Login successful!", 
+            user: safeUserData 
+        });
+
+    } catch (err) {
+        console.error("Login error:", err);
+        res.status(500).json({ error: "An error occurred during login" });
+    }
+});
+
+// post a new user
+app.post("/users", async (req, res) => {
+    try {
+        const { username, email, phone, address, password } = req.body;
+
+        // hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // call addUser from database.js
+        const result = await addUser({ 
+            username, 
+            email, 
+            phone, 
+            address, 
+            password: hashedPassword, // Store the hash!
+            account_balance: 0 
+        });
+
+        // success message
+        res.status(201).json(result);
+
+    } catch (err) {
+        console.error("Error creating user:", err);
+        res.status(500).json({ error: "Failed to create user" });
+    }
+});
+
+app.post("/users/:username/funds", async (req, res) => {
+    try {
+        const { action, amount } = req.body; 
+        const parsedAmount = parseFloat(amount);
+
+        // Validation
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            return res.status(400).json({ error: "Amount must be a number > 0" });
+        }
+
+        const user = await getUserByUsername(req.params.username);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        let currentBalance = parseFloat(user.account_balance) || 0;
+
+        if (action === "deposit") {
+            currentBalance += parsedAmount;
+        } else if (action === "withdraw") {
+            if (currentBalance < parsedAmount) {
+                return res.status(400).json({ error: "Insufficient funds." });
+            }
+            currentBalance -= parsedAmount;
+        } else {
+            return res.status(400).json({ error: "Invalid action." });
+        }
+
+        // FIX: Round to 2 decimal places to avoid JS floating point bugs
+        const finalBalance = parseFloat(currentBalance.toFixed(2));
+
+        await updateUserBalance(req.params.username, finalBalance);
+        res.status(200).json({ message: "Success", newBalance: finalBalance });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Transaction failed" });
+    }
+});
