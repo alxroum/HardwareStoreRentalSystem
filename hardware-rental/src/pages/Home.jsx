@@ -2,15 +2,11 @@ import { useEffect, useState } from 'react'
 
 import { Card } from '../components/Card'
 import { grabToolData } from '../App.jsx'
-import { useNavigate } from 'react-router-dom'
-
-// styles
 import '../styles/App.css'
 
 export function Home() {
 
     const [category, setCategory] = useState("ALL");
-    const navigateToCart = useNavigate();
         
     useEffect(() => {
         document.body.classList.add('home-page')
@@ -101,7 +97,7 @@ export function Home() {
                         </div>
                     </div>
 
-                    <button className="reserve-button" onClick={reserveItem}>Reserve Now</button>
+                    <button className="reserve-button">Reserve Now</button>
                     </div>
                 </div>
                 </div>
