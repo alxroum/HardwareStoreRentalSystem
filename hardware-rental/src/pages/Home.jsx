@@ -23,6 +23,7 @@ import { Card } from '../components/Card'
 
 // functions
 import { grabToolData } from '../App.jsx'
+import { useNavigate } from 'react-router-dom'
 
 // styles
 import '../styles/App.css'
@@ -31,6 +32,7 @@ import '../styles/App.css'
 export function Home() {
 
     const [category, setCategory] = useState("ALL");
+    const navigateToCart = useNavigate();
         
     useEffect(() => {
             document.body.classList.add('home-page')
@@ -43,39 +45,55 @@ export function Home() {
     const [selectedTool, setSelectedTool] = useState(null); // holds the tool that has been selected for the detailed popup
 
     const addToCart = (tool) => {
-        const cartItem = {
-            id: tool.idinventory,
-            name: tool.equipment_name,
-            category: tool.category,
-            dailyRate: Number(tool.daily_rate),
-            deposit: Number(tool.daily_rate) * 2,
-            qty: 1,
-            duration: '1'
-        };
 
-        // Get existing cart from localStorage
-        const cartJSON = localStorage.getItem("CART");
-        let cart = [];
-        if (cartJSON) {
-            try {
-                cart = JSON.parse(cartJSON);
-            } catch (err) {
-                console.error("Error parsing cart:", err);
+        const signedIn = localStorage.getItem("LOGGEDIN") === "true";
+
+        if(signedIn) {
+            const cartItem = {
+                id: tool.idinventory,
+                name: tool.equipment_name,
+                category: tool.category,
+                dailyRate: Number(tool.daily_rate),
+                deposit: Number(tool.daily_rate) * 2,
+                qty: 1,
+                duration: '1'
+            };
+
+            // Get existing cart from localStorage
+            const cartJSON = localStorage.getItem("CART");
+            let cart = [];
+            if (cartJSON) {
+                try {
+                    cart = JSON.parse(cartJSON);
+                } catch (err) {
+                    console.error("Error parsing cart:", err);
+                }
             }
-        }
 
-        // Check if item already in cart
-        const existingItem = cart.find(item => item.id === cartItem.id);
-        if (existingItem) {
-            existingItem.qty += 1;
+            // Check if item already in cart
+            const existingItem = cart.find(item => item.id === cartItem.id);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push(cartItem);
+            }
+
+            // Save back to localStorage
+            localStorage.setItem("CART", JSON.stringify(cart));
+            alert(`${tool.equipment_name} added to cart!`);
+            return true;
         } else {
-            cart.push(cartItem);
+            alert("Sign in first!");
+            navigateToCart("/login"); // despite the name, this will take the user to the login page
+            return false;
         }
-
-        // Save back to localStorage
-        localStorage.setItem("CART", JSON.stringify(cart));
-        alert(`${tool.equipment_name} added to cart!`);
     };
+
+    // adds the item to the cart and takes the user to the cart page
+    const reserveItem = (tool) => {
+        const result = addToCart(tool);
+        if (result) navigateToCart("/cart");
+    }
 
     const toggleExpanded = () => {
         setExpanded(!expanded);
@@ -95,6 +113,7 @@ export function Home() {
                     key={tool.idinventory}
                     onCardClick={() => setSelectedTool(tool)}
                     onCartButton={() => addToCart(tool)}
+                    onReserveButton={() => reserveItem(tool)}
                     {...tool}
                 />
             ))
@@ -166,7 +185,7 @@ export function Home() {
                         </div>
                     </div>
 
-                    <button className="reserve-button">Reserve Now</button>
+                    <button className="reserve-button" onClick={reserveItem}>Reserve Now</button>
                     </div>
                 </div>
                 </div>
