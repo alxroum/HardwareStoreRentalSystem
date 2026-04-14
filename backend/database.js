@@ -3,8 +3,6 @@ import mysql from 'mysql2'
 import dotenv from 'dotenv'
 dotenv.config()
 
-//console.log("ENV:", process.env.MYSQL_USER, process.env.MYSQL_DATABASE)
-
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -149,6 +147,7 @@ export async function updateUserBalance(targetUsername, newBalance) {
 
 // next 4 func are for orders
 
+// create an order row and return its ID
 export async function createOrder({ idusers, dateRented, dateDue, totalCost }) {
     const [result] = await pool.query(
         `INSERT INTO orders (idusers, \`date-rented\`, date_due, status, total_cost)
@@ -177,10 +176,60 @@ export async function decreaseRemainingEquipment(idinventory, qty) {
 }
 
 // get orders from user
-export async function getOrdersByUser(idusers) {
+export async function getAllOrders() {
+    try {
+        const query1 = 'SELECT o.idorders, u.username, o.`date-rented` AS dateRented, o.date_due AS dateDue, o.date_returned AS dateReturned, o.status, o.total_cost, o.late_fee FROM orders o JOIN users u ON o.idusers = u.idusers ORDER BY o.idorders DESC';
+        const [orders] = await pool.query(query1);
+
+        for (const order of orders) {
+            try {
+                const [items] = await pool.query(
+                    'SELECT i.equipment_name FROM `orders-inventory` oi JOIN inventory i ON oi.idinventory = i.idinventory WHERE oi.idorders = ?',
+                    [order.idorders]
+                );
+                order.items = items.map(i => i.equipment_name).join(', ') || 'N/A';
+            } catch (itemErr) {
+                console.error("Error fetching items for order", order.idorders, itemErr.message);
+                order.items = 'N/A';
+            }
+        }
+
+        return orders;
+    } catch (error) {
+        console.error("getAllOrders SQL error:", error.message);
+        throw error;
+    }
+}
+
+// get a single order by id (with user ifo)
+export async function getOrderById(idorders) {
     const [rows] = await pool.query(
-        `SELECT * FROM orders WHERE idusers = ? ORDER BY \`date-rented\` DESC`,
-        [idusers]
+        'SELECT o.*, u.username FROM orders o JOIN users u ON o.idusers = u.idusers WHERE o.idorders = ?',
+        [idorders]
+    );
+    return rows[0] || null;
+}
+
+// get items linked to an order (w qty info)
+export async function getOrderItems(idorders) {
+    const [rows] = await pool.query(
+        'SELECT oi.idinventory FROM `orders-inventory` oi WHERE oi.idorders = ?',
+        [idorders]
     );
     return rows;
+}
+
+export async function deleteOrderInventory(idorders) {
+    await pool.query('DELETE FROM `orders-inventory` WHERE idorders = ?', [idorders]);
+}
+
+export async function deleteOrder(idorders) {
+    await pool.query('DELETE FROM orders WHERE idorders = ?', [idorders]);
+}
+
+export async function increaseRemainingEquipment(idinventory, qty) {
+    await pool.query(
+        'UPDATE inventory SET remaining_equipment = LEAST(remaining_equipment + ?, total_equipment) WHERE idinventory = ?',
+        [qty, idinventory]
+    );
 }

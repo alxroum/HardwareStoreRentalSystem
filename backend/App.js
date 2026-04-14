@@ -10,7 +10,7 @@ import { addUser } from './database.js';
 import { getUsers } from './database.js';
 import { getUserByUsername } from './database.js';
 import { updateUserBalance } from './database.js';
-import { createOrder, addOrderInventory, decreaseRemainingEquipment } from './database.js';
+import { createOrder, addOrderInventory, decreaseRemainingEquipment, getAllOrders, getOrderById, getOrderItems, deleteOrderInventory, deleteOrder, increaseRemainingEquipment } from './database.js';
 import bcrypt from 'bcrypt';
 
 const app = express()
@@ -194,6 +194,18 @@ app.post("/users", async (req, res) => {
     }
 });
 
+// Get current balance for a user
+app.get("/users/:username/balance", async (req, res) => {
+    try {
+        const user = await getUserByUsername(req.params.username);
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.json({ balance: user.account_balance });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch balance" });
+    }
+});
+
 // add/withdraw funds
 app.post("/users/:username/funds", async (req, res) => {
     try {
@@ -277,5 +289,80 @@ app.post("/checkout", async (req, res) => {
     } catch (err) {
         console.error("Checkout error:", err);
         res.status(500).json({ error: "Checkout failed" });
+    }
+});
+
+// Get all orders for admin dashboard
+app.get("/orders", async (req, res) => {
+    try {
+        const orders = await getAllOrders();
+        res.json(orders);
+    } catch (err) {
+        console.error("Error fetching orders:", err);
+        res.status(500).json({ error: "Failed to fetch orders" });
+    }
+});
+
+// refund an order (partial or full). This also wont delete the order incase we still want that active
+app.post("/orders/:id/refund", async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const { amount } = req.body;
+        const refundAmount = parseFloat(amount);
+
+        if (isNaN(refundAmount) || refundAmount <= 0) {
+            return res.status(400).json({ error: "Refund amount must be greater than 0" });
+        }
+
+        // Get order to find the user
+        const order = await getOrderById(orderId);
+        if (!order) return res.status(404).json({ error: "Order not found" });
+
+        if (refundAmount > parseFloat(order.total_cost)) {
+            return res.status(400).json({ error: "Refund cannot exceed order total" });
+        }
+
+        // Add refund to user balance
+        const user = await getUserByUsername(order.username);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const currentBalance = parseFloat(user.account_balance) || 0;
+        const newBalance = parseFloat((currentBalance + refundAmount).toFixed(2));
+        await updateUserBalance(order.username, newBalance);
+
+        res.json({
+            message: `Refunded $${refundAmount.toFixed(2)} to ${order.username}`,
+            newBalance: newBalance
+        });
+
+    } catch (err) {
+        console.error("Refund error:", err);
+        res.status(500).json({ error: "Refund failed" });
+    }
+});
+
+// Delete an order restore inventory, no refundd
+app.delete("/orders/:id", async (req, res) => {
+    try {
+        const orderId = req.params.id;
+
+        const order = await getOrderById(orderId);
+        if (!order) return res.status(404).json({ error: "Order not found" });
+
+        // restore inv
+        const orderItems = await getOrderItems(orderId);
+        for (const item of orderItems) {
+            await increaseRemainingEquipment(item.idinventory, 1);
+        }
+
+        // Delete links then order
+        await deleteOrderInventory(orderId);
+        await deleteOrder(orderId);
+
+        res.json({ message: "Order deleted" });
+
+    } catch (err) {
+        console.error("Error deleting order:", err);
+        res.status(500).json({ error: "Failed to delete order" });
     }
 });

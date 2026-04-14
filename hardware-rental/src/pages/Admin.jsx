@@ -39,7 +39,7 @@ function AvailCell({ remaining, total }) {
 export function Admin() {
     const [activeTab, setActiveTab]   = useState('inventory')
     const [inventory, setInventory]   = useState([])
-    const [orders]                    = useState([])
+    const [orders, setOrders]         = useState([])
     const [showModal, setShowModal]   = useState(false)
     const [formErrors, setFormErrors] = useState([])
 
@@ -68,6 +68,17 @@ export function Admin() {
                 image:       item.image_icon
             }))))
             .catch(err => console.error("Fetch error:", err))
+
+        // Fetch orders
+        fetch("http://localhost:8080/orders")
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to fetch orders");
+                return res.json();
+            })
+            .then(data => {
+                if (Array.isArray(data)) setOrders(data);
+            })
+            .catch(err => console.error("Orders fetch error:", err))
     }, [])
 
     // derived stats
@@ -166,6 +177,53 @@ export function Admin() {
         setFormErrors([])
     }
 
+    async function handleRefund(order) {
+        const maxRefund = Number(order.total_cost || 0);
+        const input = prompt(`Enter refund amount for order #${order.idorders} (max $${maxRefund.toFixed(2)}):`);
+        if (input === null) return; // cancelled
+
+        const amount = parseFloat(input);
+        if (isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid amount greater than 0.");
+            return;
+        }
+        if (amount > maxRefund) {
+            alert(`Refund cannot exceed the order total of $${maxRefund.toFixed(2)}.`);
+            return;
+        }
+
+        try {
+            const res = await fetch(`http://localhost:8080/orders/${order.idorders}/refund`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Refund failed");
+
+            alert(`Refunded $${amount.toFixed(2)} to ${order.username}.`);
+        } catch (err) {
+            console.error("Refund error:", err);
+            alert("Refund failed: " + err.message);
+        }
+    }
+
+    async function handleDeleteOrder(orderId) {
+        if (!confirm(`Delete order #${orderId}? This will remove the order and restore inventory. No refund will be issued.`)) return;
+
+        try {
+            const res = await fetch(`http://localhost:8080/orders/${orderId}`, { method: "DELETE" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Delete failed");
+
+            setOrders(prev => prev.filter(o => o.idorders !== orderId));
+            alert("Order deleted.");
+        } catch (err) {
+            console.error("Delete order error:", err);
+            alert("Failed to delete order: " + err.message);
+        }
+    }
+
     function handleImageUpload(e) {
         const file = e.target.files[0]
         if (file) setNewItem({ ...newItem, image: file })
@@ -207,7 +265,6 @@ export function Admin() {
                 </div>
             </div>
 
-            {/* tab btns for Inventory and Orders */}
             <div className="admin-tabs">
                 <button className={activeTab === 'inventory' ? 'tab-active' : 'tab'} onClick={() => setActiveTab('inventory')}>
                     Inventory
@@ -217,7 +274,6 @@ export function Admin() {
                 </button>
             </div>
 
-            {/* inv tab */}
             {activeTab === 'inventory' && (
                 <div className="admin-section">
                     <div className="section-toolbar">
@@ -266,7 +322,6 @@ export function Admin() {
                                                     <input value={editItem.name ?? ''} onChange={e => setEditItem({...editItem, name: e.target.value})} placeholder="Name" />
                                                 </div>
                                             </td>
-                                             {/* this creates our dropdown. If we want more add here in the future. */}
                                             <td>
                                                 <select value={editItem.category ?? ''} onChange={e => setEditItem({...editItem, category: e.target.value})}>
                                                     <option value="">Select…</option>
@@ -320,32 +375,44 @@ export function Admin() {
             {activeTab === 'orders' && (
                 <div className="admin-section">
                     <div className="section-toolbar">
-                        <h3>Customer Orders</h3>
+                        <h3>Customer Orders <span className="item-count-badge">{orders.length}</span></h3>
                     </div>
                     <table className="admin-table">
                         <thead>
                             <tr>
-                                <th>Order ID</th><th>Customer</th><th>Item</th>
-                                <th>Date Rented</th><th>Date Due</th><th>Status</th><th>Total Cost</th>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Date Rented</th>
+                                <th>Date Due</th>
+                                <th>Status</th>
+                                <th>Total Cost</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {orders.length === 0 && (
-                                <tr><td colSpan={7}>
-                                    <div className="empty-state">
-                                        <span></span>No orders yet.
-                                    </div>
+                                <tr><td colSpan={8}>
+                                    <div className="empty-state">No orders yet.</div>
                                 </td></tr>
                             )}
                             {orders.map(order => (
-                                <tr key={order.id}>
-                                    <td>{order.id}</td>
+                                <tr key={order.idorders}>
+                                    <td>{order.idorders}</td>
                                     <td>{order.username}</td>
-                                    <td>{order.item}</td>
-                                    <td>{order.dateRented}</td>
-                                    <td>{order.dateDue}</td>
-                                    <td><span className={`status-${order.status.toLowerCase()}`}>{order.status}</span></td>
-                                    <td className="rate-cell">${order.totalCost.toFixed(2)}</td>
+                                    <td>{order.items || 'N/A'}</td>
+                                    <td>{order.dateRented ? new Date(order.dateRented).toLocaleDateString() : '—'}</td>
+                                    <td>{order.dateDue ? new Date(order.dateDue).toLocaleDateString() : '—'}</td>
+                                    <td><span className={`status-${(order.status || 'active').toLowerCase()}`}>{order.status || 'Active'}</span></td>
+                                    <td className="rate-cell">${Number(order.total_cost || 0).toFixed(2)}</td>
+                                    <td>
+                                        <button className="edit-button" onClick={() => handleRefund(order)}>
+                                            Refund
+                                        </button>
+                                        <button className="remove-button" onClick={() => handleDeleteOrder(order.idorders)}>
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
