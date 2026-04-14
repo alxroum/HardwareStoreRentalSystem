@@ -1,106 +1,122 @@
 import { useEffect, useState } from 'react'
 
-// pages (CSS issue is here, uses styling for last page imported, in this case it's SignUp.)
+// pages
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Admin } from './pages/Admin'
 import { Cart } from './pages/Cart'
 import { SignUp } from './pages/SignUp'
 import { Account } from './pages/Account'
-import { createContext, useContext } from 'react';
-import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom'
 
-// // graphics
-// import circularSaw from './assets/circular-saw.png'
-// import powerWasher from './assets/power-washer.png'
-// import paintSprayer from './assets/paint-sprayer.png'
-// import chainsaw from './assets/chainsaw.png'
-// import jackhammer from './assets/jackhammer.png'
-// import powerAuger from './assets/power-auger.png'
 import cartIcon from '/assets/cart-icon.png'
 import logo from '/assets/logo.png'
 
 import './styles/App.css'
 
-// represents the data that will be stored in each card (acts as the database until we implement it)
 import tool_data from './tool_data.json'
 
 // this function should ideally be moved to a dedicated database file with the read and write functions
-export function grabToolData() { // grabs the card and tool data from the database into the tools list
-
+export function grabToolData() {
     const [inventory, setInventory] = useState([])
 
-    useEffect(() => { // fetch the tool data from the database
-    fetch("http://localhost:8080/inventory")
-        .then(res => res.json())
-        .then(data => {
-            console.log("INVENTORY FROM BACKEND:", data)   // 👈 ADDED
-            setInventory(data)
-        })
-        .catch(err => console.error("Error fetching inventory:", err))
+    useEffect(() => {
+        fetch("http://localhost:8080/inventory")
+            .then(res => res.json())
+            .then(data => {
+                console.log("INVENTORY FROM BACKEND:", data)
+                setInventory(data)
+            })
+            .catch(err => console.error("Error fetching inventory:", err))
     }, [])
-    //console.log(inventory);
+
     return inventory;
 }
 
-function Nav() {
-  return (
-    <nav>
-        <div className='nav-left'>
-        <Link className="hidden-link" to="/" style={{cursor: 'pointer'}}>
-          <div id="nav-header"> <img id="nav-logo" src={logo}></img> <h2 id="header-text">Hardware Rental</h2> </div>
-        </Link>
-        </div>
-        
-        <div className='nav-right'>
-        <div id="login-area">
-          <Link className="hidden-link" to="/admin" style={{cursor: 'pointer'}}>
-            <div id="admin-page-button">
-                Admin
+function Nav({ loggedIn, onLogout }) {
+    return (
+        <nav>
+            <div className='nav-left'>
+                <Link className="hidden-link" to="/" style={{ cursor: 'pointer' }}>
+                    <div id="nav-header">
+                        <img id="nav-logo" src={logo}></img>
+                        <h2 id="header-text">Hardware Rental</h2>
+                    </div>
+                </Link>
             </div>
-          </Link>
-          <Link className="hidden-link" to="/account" style={{cursor: 'pointer'}}>
-            <div id="account-page-button">
-                Account
-                {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
-            </div>
-          </Link>
-          <Link className="hidden-link" to="/login" style={{cursor: 'pointer'}}>
-            <div id="login-page-button">
-                Login
-            </div>
-          </Link>
-          <Link className="hidden-link" to="/cart" style={{cursor: 'pointer'}}>
-            <div id="cart-page-button">
-                Cart
-                {/* <img className="page-link-icon" src={cartIcon} height="50px"></img> */}
-            </div>
-          </Link>
-        </div>
-        </div>
-    </nav>
-  )
+
+            {/* Only show nav links when logged in */}
+            {loggedIn && (
+                <div className='nav-right'>
+                    <div id="login-area">
+                        <Link className="hidden-link" to="/admin" style={{ cursor: 'pointer' }}>
+                            <div id="admin-page-button">Admin</div>
+                        </Link>
+                        <Link className="hidden-link" to="/account" style={{ cursor: 'pointer' }}>
+                            <div id="account-page-button">Account</div>
+                        </Link>
+                        <Link className="hidden-link" to="/cart" style={{ cursor: 'pointer' }}>
+                            <div id="cart-page-button">Cart</div>
+                        </Link>
+                    </div>
+                </div>
+            )}
+        </nav>
+    )
 }
 
 function App() {
-  
-  return (
-    <>
-    {/* Create a context provider for the user information. This will allow all pages to access and change the user id */}
-    <Router>
-      <Nav/> {/* Display the navigation on all pages */}
-      <Routes>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/login' element={<Login/>}/>
-        <Route path='/admin' element={<Admin/>}/>
-        <Route path='/cart' element={<Cart/>}/>
-        <Route path='/signup' element={<SignUp/>}/>
-        <Route path='/signUp' element={<SignUp/>}/>
-        <Route path='/account' element={<Account/>}/>
-      </Routes>
-    </Router>
-    </>
-  )
+    // Check localStorage on mount to persist login across refreshes
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("LOGGEDIN") === "true");
 
+    // Listen for login state changes (e.g. from Account logout)
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setLoggedIn(localStorage.getItem("LOGGEDIN") === "true");
+        };
+        window.addEventListener("loginStateChanged", handleStorageChange);
+        return () => window.removeEventListener("loginStateChanged", handleStorageChange);
+    }, []);
+
+    const handleLogin = () => {
+        setLoggedIn(true);
+    };
+
+    const handleLogout = () => {
+        localStorage.setItem("USER", null);
+        localStorage.setItem("LOGGEDIN", "false");
+        setLoggedIn(false);
+    };
+
+    return (
+        <>
+            <Router>
+                <Nav loggedIn={loggedIn} onLogout={handleLogout} />
+                <Routes>
+                    {/* Login and SignUp are always accessible */}
+                    <Route path='/login' element={
+                        loggedIn ? <Navigate to="/" /> : <Login onLogin={handleLogin} />
+                    } />
+                    <Route path='/signup' element={<SignUp />} />
+                    <Route path='/signUp' element={<SignUp />} />
+
+                    {/* Everything else requires login */}
+                    <Route path='/' element={
+                        loggedIn ? <Home /> : <Navigate to="/login" />
+                    } />
+                    <Route path='/admin' element={
+                        loggedIn ? <Admin /> : <Navigate to="/login" />
+                    } />
+                    <Route path='/cart' element={
+                        loggedIn ? <Cart /> : <Navigate to="/login" />
+                    } />
+                    <Route path='/account' element={
+                        loggedIn ? <Account onLogout={handleLogout} /> : <Navigate to="/login" />
+                    } />
+                </Routes>
+            </Router>
+        </>
+    )
 }
+
 export default App

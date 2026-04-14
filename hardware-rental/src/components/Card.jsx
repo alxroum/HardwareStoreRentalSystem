@@ -1,8 +1,8 @@
-// This file contains the template code for each item card. Data is passed into the function and the card can be rendered on the page.
 import React from "react";
 import { useId } from "react";
 
 export function Card({
+    idinventory,
     category = "UNCATEGORIZED",
     equipment_name = "Unnamed",
     equipment_description = "No description",
@@ -11,16 +11,40 @@ export function Card({
     weekly_rate = 0,
     image_icon = "power-auger.png",
     onCardClick,
-    onReserveButton,
-    onCartButton
 }) {
 
-    const c_id = "card_" + useId(); // assign a unique id to be used as the card's id html parameter
+    const c_id = "card_" + useId();
+
+    function handleAddToCart() {
+        // get cart from localStorage
+        const existing = JSON.parse(localStorage.getItem("CART") || "[]");
+
+        // item chk
+        const index = existing.findIndex(item => item.id === idinventory);
+
+        if (index >= 0) {
+            existing[index].qty += 1;
+        } else {
+            // add item via push
+            existing.push({
+                id: idinventory,
+                name: equipment_name,
+                category: category,
+                dailyRate: Number(daily_rate),
+                weeklyRate: Number(weekly_rate),
+                deposit: Number(daily_rate) * 2,
+                qty: 1,
+                duration: '1',
+            });
+        }
+
+        localStorage.setItem("CART", JSON.stringify(existing));
+        alert(`${equipment_name} added to cart!`);
+    }
 
     return (
         <div id={c_id} className="card">
             <div className='top-half'>
-                {/* had to swap image rendering to backend rendering */}
                 <img 
                     className="item-image" 
                     src={image_icon?.startsWith('/uploads/') ? `http://localhost:8080${image_icon}` : `/assets/${image_icon}`} 
@@ -42,8 +66,8 @@ export function Card({
                         ${weekly_rate.toFixed(2)}
                     </div>
                 </div>
-                <button className="reserve-button">Reserve Now</button>
-                <button className="cart-button">Add to Cart</button>
+                <button className="reserve-button" onClick={onCardClick}>View Details</button>
+                <button className="cart-button" onClick={handleAddToCart}>Add to Cart</button>
             </div>
         </div>
     )
