@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import './Checkout.css';
 
-export function Checkout({ items, onClose, onConfirm }) {
+export function Checkout({ items, accountBalance = 0, username, onClose, onConfirm }) {
   const [status, setStatus] = useState('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // get user data and bal from localStorage
   const userData = JSON.parse(localStorage.getItem("USER") || "{}");
@@ -30,6 +31,8 @@ export function Checkout({ items, onClose, onConfirm }) {
 
   const handleConfirm = async () => {
     setStatus('processing');
+    setErrorMessage('');
+
     try {
       const response = await fetch("http://localhost:8080/checkout", {
         method: "POST",
@@ -64,7 +67,7 @@ export function Checkout({ items, onClose, onConfirm }) {
   const confirmLabel = () => {
     if (status === 'processing') return 'Processing…';
     if (status === 'success')    return '✓ Order placed!';
-    if (status === 'error')      return 'Something went wrong — try again';
+    if (status === 'error')      return 'Try again';
     if (!canPay)                 return 'Insufficient balance';
     return 'Confirm & place order';
   };
@@ -127,6 +130,11 @@ export function Checkout({ items, onClose, onConfirm }) {
               <div className="co-balance-warning">
                 Balance is ${(total - accountBalance).toFixed(2)} short.{' '}
                 <a href="#/account" className="co-balance-add-link" onClick={onClose}>Add funds →</a>
+              </div>
+            )}
+            {errorMessage && (
+              <div className="co-balance-warning" style={{ color: '#d32f2f' }}>
+                {errorMessage}
               </div>
             )}
           </div>

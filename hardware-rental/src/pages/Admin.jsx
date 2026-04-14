@@ -49,6 +49,14 @@ export function Admin() {
         quality: 'Good', image: null
     })
 
+    // Reload user balance from localStorage to reflect the updated balance from checkout
+    const userJSON = localStorage.getItem("USER");
+    const user = JSON.parse(userJSON);
+     
+    const [activeTab, setActiveTab] = useState('inventory')
+    // removed sample inventory data. We're going to be adding directly into the db now
+    const [inventory, setInventory] = useState([])
+    const [orders] = useState([])
     const [editingId, setEditingId] = useState(null)
     const [editItem, setEditItem]   = useState({})
 
@@ -234,7 +242,9 @@ export function Admin() {
         setShowModal(true)
     }
 
-    return (
+    
+    // rendering
+    return (user != null && user.username == "admin" && (
         <div className="admin-page">
 
             <div className="admin-header">
@@ -488,4 +498,4 @@ export function Admin() {
             )}
         </div>
     )
-}
+)}

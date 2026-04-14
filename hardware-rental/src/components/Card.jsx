@@ -44,7 +44,8 @@ export function Card({
 
     return (
         <div id={c_id} className="card">
-            <div className='top-half'>
+            <div className='top-half' onClick={onCardClick}>
+                {/* had to swap image rendering to backend rendering */}
                 <img 
                     className="item-image" 
                     src={image_icon?.startsWith('/uploads/') ? `http://localhost:8080${image_icon}` : `/assets/${image_icon}`} 

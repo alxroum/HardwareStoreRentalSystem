@@ -10,6 +10,7 @@ import { addUser } from './database.js';
 import { getUsers } from './database.js';
 import { getUserByUsername } from './database.js';
 import { updateUserBalance } from './database.js';
+import { processCheckoutData } from './database.js';
 import { createOrder, addOrderInventory, decreaseRemainingEquipment, getAllOrders, getOrderById, getOrderItems, deleteOrderInventory, deleteOrder, increaseRemainingEquipment } from './database.js';
 import bcrypt from 'bcrypt';
 
@@ -209,7 +210,7 @@ app.get("/users/:username/balance", async (req, res) => {
 // add/withdraw funds
 app.post("/users/:username/funds", async (req, res) => {
     try {
-        const { action, amount } = req.body; 
+        const { action, amount } = req.body;
         const parsedAmount = parseFloat(amount);
 
         if (isNaN(parsedAmount) || parsedAmount <= 0) {

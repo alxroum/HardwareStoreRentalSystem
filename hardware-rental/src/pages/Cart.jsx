@@ -8,6 +8,8 @@ export function Cart() {
     return JSON.parse(localStorage.getItem("CART") || "[]");
   });
   const [showCheckout, setShowCheckout] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [accountBalance, setAccountBalance] = useState(0);
 
   // Sync cart back to localStorage whenever items change
   useEffect(() => {
@@ -30,14 +32,29 @@ export function Cart() {
   const delivery = 15;
   const total    = subtotal + deposit + delivery;
 
-  const updateQty = (id, delta) =>
-    setItems(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
+  const updateQty = (id, delta) => {
+    setItems(prev => {
+      const updated = prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i);
+      localStorage.setItem("CART", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-  const updateDuration = (id, duration) =>
-    setItems(prev => prev.map(i => i.id === id ? { ...i, duration } : i));
+  const updateDuration = (id, duration) => {
+    setItems(prev => {
+      const updated = prev.map(i => i.id === id ? { ...i, duration } : i);
+      localStorage.setItem("CART", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-  const removeItem = (id) =>
-    setItems(prev => prev.filter(i => i.id !== id));
+  const removeItem = (id) => {
+    setItems(prev => {
+      const updated = prev.filter(i => i.id !== id);
+      localStorage.setItem("CART", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const handleOrderConfirmed = (newBalance) => {
     // clr cart
@@ -151,6 +168,8 @@ export function Cart() {
       {showCheckout && (
         <Checkout
           items={items}
+          accountBalance={accountBalance}
+          username={currentUser?.username}
           onClose={() => setShowCheckout(false)}
           onConfirm={handleOrderConfirmed}
         />
