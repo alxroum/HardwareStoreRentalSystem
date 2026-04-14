@@ -1,71 +1,154 @@
-/* CSS Styling for Sign Up page. */
-
-body {
+#root-element {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    background-color: #f0f0f0;
-    overflow-y: auto;
+    min-height: calc(100vh - 70px);
+    background: #f0f0f0;
+    padding: 20px;
 }
 
-.signup-label {
-    justify-content: center;
-    background-color: lightgray;
-    width:180px;
-    margin: 0 auto;
-    border: 10px solid white;
-    border-radius: 20px;
-}
-
-.nav-left {
-    width:500px;
-}
-
-#signup-input { 
-    margin: 0 auto;
-    padding: 2em;
-    background-color: white;
-    border-radius: 1em;
-    box-shadow: 3px 3px rgb(218, 218, 218);
-    color: black;
-    width: 300px;
-    height: 430px;
-}
-
-#register-account {
-    justify-content: center;
-    background-color: lightgray;
-    width:300px;
-    margin: 0 auto;
-    border-radius: 20px;
-}
-
-#signup-button { /* Resets to default styling for login button. */
-    all: unset;
-}
-
-#disclaimer {
-    justify-content: center;
-    background-color: lightgray;
-    width:300px;
-    margin: 0 auto;
-    border-radius: 20px;
-}
-
-/* Hard-Coded Styling (To fix client-side light/dark mode issues):  */
-
-#confirm-password-input > input, #email-input > input, #phone-input > input, #address-input > input {
-    background-color: white;
-    border: 1px solid black;
-    color: black;
+#signup-box {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
 }
 
 #signup-h1 {
-    color: black;
+    margin: 0;
+    padding: 28px 32px 4px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
 }
 
 #signup-h5 {
-    color: lightcoral;
+    text-align: center;
+    color: #ccc;
+    font-weight: 500;
+    font-size: 0.8rem;
+    margin: 4px 0 0 0;
+}
+
+#signup-input {
+    padding: 0 32px 32px;
+    width: auto;
+    height: auto;
+    background: white;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.signup-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin: 16px 0 6px 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    width: auto;
+    padding: 0;
+}
+
+#username-label {
+    margin-top: 0;
+}
+
+#signup-input #username-input > input,
+#signup-input #email-input > input,
+#signup-input #phone-input > input,
+#signup-input #address-input > input,
+#signup-input #password-input > input,
+#signup-input #confirm-password-input > input,
+#signup-input input[type="text"],
+#signup-input input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 10px;
+    background: #fafafa !important;
+    color: #333 !important;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#signup-input #username-input > input:focus,
+#signup-input #email-input > input:focus,
+#signup-input #phone-input > input:focus,
+#signup-input #address-input > input:focus,
+#signup-input #password-input > input:focus,
+#signup-input #confirm-password-input > input:focus,
+#signup-input input[type="text"]:focus,
+#signup-input input[type="password"]:focus {
+    border-color: #FFA500 !important;
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.15);
+}
+
+#signup-input input::placeholder {
+    color: #bbb !important;
+}
+
+#signup-button {
+    all: unset;
+    display: block;
+    margin-top: 24px;
+}
+
+#signup-button button {
+    width: 100%;
+    padding: 13px;
+    background: #FFA500;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    letter-spacing: 0.3px;
+}
+
+#signup-button button:hover {
+    background: #e69400;
+    box-shadow: 0 4px 14px rgba(255, 165, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+#signup-button button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+#disclaimer {
+    background: none;
+    border: none;
+    border-radius: 0;
+    width: auto;
+    margin-top: 16px;
+    text-align: center;
 }
 
 #disclaimer-text {
-    color: black;
+    color: #aaa;
+    font-size: 0.78rem;
+}
+
+@media (max-width: 480px) {
+    #signup-input {
+        padding: 0 20px 24px;
+    }
+
+    #signup-h1 {
+        padding: 24px 20px 4px;
+    }
 }
