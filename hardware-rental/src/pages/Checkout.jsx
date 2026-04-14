@@ -1,10 +1,23 @@
 import { useState } from 'react';
 import './Checkout.css';
 
-export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm }) {
+export function Checkout({ items, onClose, onConfirm }) {
   const [status, setStatus] = useState('idle');
 
-  const getRate = (item) => item.dailyRate * parseInt(item.duration);
+  // get user data and bal from localStorage
+  const userData = JSON.parse(localStorage.getItem("USER") || "{}");
+  const accountBalance = parseFloat(userData.account_balance) || 0;
+
+  const getRate = (item) => {
+    const days = parseInt(item.duration);
+    if (days >= 7) {
+      const weeks = Math.floor(days / 7);
+      const extraDays = days % 7;
+      return (item.weeklyRate * weeks) + (item.dailyRate * extraDays);
+    }
+    return item.dailyRate * days;
+  };
+
   const subtotal = items.reduce((s, i) => s + getRate(i) * i.qty, 0);
   const deposit  = items.reduce((s, i) => s + i.deposit * i.qty, 0);
   const delivery = 15;
@@ -12,13 +25,38 @@ export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm })
   const balanceAfter = accountBalance - total;
   const canPay = accountBalance >= total;
 
+  //  longest duration across all items for the order due date
+  const maxDuration = Math.max(...items.map(i => parseInt(i.duration)));
+
   const handleConfirm = async () => {
     setStatus('processing');
     try {
-      await new Promise(resolve => setTimeout(resolve, 1400));
+      const response = await fetch("http://localhost:8080/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: userData.username,
+          items: items.map(i => ({ id: i.id, qty: i.qty })),
+          totalCost: total,
+          durationDays: maxDuration
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Checkout failed");
+      }
+
       setStatus('success');
-      if (onConfirm) onConfirm({ paymentMethod: 'balance', total });
-    } catch {
+
+      // pass new bal back to Cart so it can update localStoragee
+      setTimeout(() => {
+        if (onConfirm) onConfirm(data.newBalance);
+      }, 1500);
+
+    } catch (err) {
+      console.error("Checkout error:", err);
       setStatus('error');
     }
   };
@@ -88,7 +126,7 @@ export function Checkout({ items, accountBalance = 124.50, onClose, onConfirm })
             {!canPay && (
               <div className="co-balance-warning">
                 Balance is ${(total - accountBalance).toFixed(2)} short.{' '}
-                <button className="co-balance-add-link">Add funds →</button>
+                <a href="#/account" className="co-balance-add-link" onClick={onClose}>Add funds →</a>
               </div>
             )}
           </div>

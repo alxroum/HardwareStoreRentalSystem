@@ -1,16 +1,17 @@
 import express from 'express'
 import multer from "multer"
 import cors from 'cors';
-import{getInventory} from './database.js'
-import {addInventoryItem} from "./database.js"
+import { getInventory } from './database.js'
+import { addInventoryItem } from "./database.js"
 import { deleteInventoryItem } from "./database.js"
 import { updateInventoryItem } from "./database.js"
 import { getUsernames } from './database.js'
 import { addUser } from './database.js';
 import { getUsers } from './database.js';
 import { getUserByUsername } from './database.js';
-import bcrypt from 'bcrypt';
 import { updateUserBalance } from './database.js';
+import { createOrder, addOrderInventory, decreaseRemainingEquipment } from './database.js';
+import bcrypt from 'bcrypt';
 
 const app = express()
 
@@ -71,7 +72,7 @@ app.post("/inventory", upload.single("image"), async (req, res) => {
 
 app.use("/uploads", express.static("uploads"))
 
-// update route, must be aftter post route
+// update route
 app.put("/inventory/:id", async (req, res) => {
     const id = req.params.id
     try {
@@ -109,13 +110,12 @@ app.use((err, req, res, next) => {
     res.status(500).send('something broke')
 })
 
-app.listen(8080, () =>{
+app.listen(8080, () => {
     console.log('Server is running on port 8080')
 })
 
 // get list of usernames
 app.get("/usernames", async (req, res) => {
-
     try {
         const ids = await getUsernames();
         res.json(ids);
@@ -128,9 +128,8 @@ app.get("/usernames", async (req, res) => {
 // get all user data
 app.get("/users", async (req, res) => {
     try {
-        const allUsers = await getUsers(); // Your DB function to get everything
+        const allUsers = await getUsers();
         
-        // Security check: remove passwords before sending
         const safeUsers = allUsers.map(user => {
             const { password, ...safeData } = user;
             return safeData;
@@ -143,19 +142,13 @@ app.get("/users", async (req, res) => {
     }
 })
 
-// use POST to validate credentials for security
-// GET moves the data to the localhost url and passwords are exposed
+// login
 app.post("/login", async (req, res) => {
     try {
-        // retrieve the username and password from the request
         const { username, password } = req.body;
-
-        // 
         const user = await getUserByUsername(username); 
 
-        // check if the user exists
         if (!user) {
-            // bad login
             return res.status(401).json({ error: "Invalid username or password" });
         }
 
@@ -165,7 +158,6 @@ app.post("/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid username or password" });
         }
 
-        // if everything matches, remove the password and send everything back
         const { password: userPassword, ...safeUserData } = user;
         
         res.status(200).json({ 
@@ -183,21 +175,17 @@ app.post("/login", async (req, res) => {
 app.post("/users", async (req, res) => {
     try {
         const { username, email, phone, address, password } = req.body;
-
-        // hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // call addUser from database.js
         const result = await addUser({ 
             username, 
             email, 
             phone, 
             address, 
-            password: hashedPassword, // Store the hash!
+            password: hashedPassword,
             account_balance: 0 
         });
 
-        // success message
         res.status(201).json(result);
 
     } catch (err) {
@@ -206,12 +194,12 @@ app.post("/users", async (req, res) => {
     }
 });
 
+// add/withdraw funds
 app.post("/users/:username/funds", async (req, res) => {
     try {
         const { action, amount } = req.body; 
         const parsedAmount = parseFloat(amount);
 
-        // Validation
         if (isNaN(parsedAmount) || parsedAmount <= 0) {
             return res.status(400).json({ error: "Amount must be a number > 0" });
         }
@@ -232,7 +220,6 @@ app.post("/users/:username/funds", async (req, res) => {
             return res.status(400).json({ error: "Invalid action." });
         }
 
-        // FIX: Round to 2 decimal places to avoid JS floating point bugs
         const finalBalance = parseFloat(currentBalance.toFixed(2));
 
         await updateUserBalance(req.params.username, finalBalance);
@@ -241,5 +228,54 @@ app.post("/users/:username/funds", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Transaction failed" });
+    }
+});
+
+// checkout: create order, link items, deduct balance, update inventory 
+app.post("/checkout", async (req, res) => {
+    try {
+        const { username, items, totalCost, durationDays } = req.body;
+
+        // gets user
+        const user = await getUserByUsername(username);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // checkk the balance
+        const currentBalance = parseFloat(user.account_balance) || 0;
+        if (currentBalance < totalCost) {
+            return res.status(400).json({ error: "Insufficient funds" });
+        }
+
+        // create the order
+        const now = new Date();
+        const due = new Date(now);
+        due.setDate(due.getDate() + (durationDays || 1));
+
+        const orderId = await createOrder({
+            idusers: user.idusers,
+            dateRented: now,
+            dateDue: due,
+            totalCost: totalCost
+        });
+
+        // should link each item to the order and decrease remaining stock, important.
+        for (const item of items) {
+            await addOrderInventory(orderId, item.id);
+            await decreaseRemainingEquipment(item.id, item.qty);
+        }
+
+        // bal deduction
+        const newBalance = parseFloat((currentBalance - totalCost).toFixed(2));
+        await updateUserBalance(username, newBalance);
+
+        res.status(201).json({
+            message: "Order placed successfully",
+            orderId: orderId,
+            newBalance: newBalance
+        });
+
+    } catch (err) {
+        console.error("Checkout error:", err);
+        res.status(500).json({ error: "Checkout failed" });
     }
 });

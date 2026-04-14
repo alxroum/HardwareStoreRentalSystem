@@ -2,37 +2,28 @@ import { useState, useEffect } from 'react';
 import './Cart.css';
 import { Checkout } from './Checkout';
 
-const ACCOUNT_BALANCE = 124.50;
-
 export function Cart() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Load cart from localStorage on first render
+  const [items, setItems] = useState(() => {
+    return JSON.parse(localStorage.getItem("CART") || "[]");
+  });
   const [showCheckout, setShowCheckout] = useState(false);
 
+  // Sync cart back to localStorage whenever items change
   useEffect(() => {
-    fetch('http://localhost:8080/inventory')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch inventory');
-        return res.json();
-      })
-      .then(data => {
-        const withDefaults = data.map(item => ({
-          id:        item.idinventory,
-          name:      item.equipment_name,
-          category:  item.category,
-          dailyRate: Number(item.daily_rate),
-          deposit:   Number(item.daily_rate) * 2, // 2× daily rate — adjust multiplier as needed
-          qty:       1,
-          duration:  '1',
-        }));
-        setItems(withDefaults);
-      })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+    localStorage.setItem("CART", JSON.stringify(items));
+  }, [items]);
 
-  const getRate = (item) => item.dailyRate * parseInt(item.duration);
+  const getRate = (item) => {
+    const days = parseInt(item.duration);
+    // swap to weekly rate if dur is > 7d
+    if (days >= 7) {
+      const weeks = Math.floor(days / 7);
+      const extraDays = days % 7;
+      return (item.weeklyRate * weeks) + (item.dailyRate * extraDays);
+    }
+    return item.dailyRate * days;
+  };
 
   const subtotal = items.reduce((sum, i) => sum + getRate(i) * i.qty, 0);
   const deposit  = items.reduce((sum, i) => sum + i.deposit * i.qty, 0);
@@ -48,13 +39,20 @@ export function Cart() {
   const removeItem = (id) =>
     setItems(prev => prev.filter(i => i.id !== id));
 
-  const handleOrderConfirmed = () => {
+  const handleOrderConfirmed = (newBalance) => {
+    // clr cart
     setItems([]);
+    localStorage.setItem("CART", "[]");
+    
+    // update user balance
+    const userData = JSON.parse(localStorage.getItem("USER"));
+    if (userData) {
+      userData.account_balance = "" + newBalance;
+      localStorage.setItem("USER", JSON.stringify(userData));
+    }
+
     setShowCheckout(false);
   };
-
-  if (loading) return <div className="cart-page"><p style={{ textAlign: 'center' }}>Loading cart...</p></div>;
-  if (error)   return <div className="cart-page"><p style={{ textAlign: 'center', color: 'red' }}>Error: {error}</p></div>;
 
   return (
     <div className="cart-page">
@@ -63,7 +61,7 @@ export function Cart() {
       {items.length === 0 ? (
         <div className="cart-empty">
           <p>Your cart is empty.</p>
-          <a href="#">← Browse equipment</a>
+          <a href="#/">← Browse equipment</a>
         </div>
       ) : (
         <div className="cart-layout">
@@ -153,7 +151,6 @@ export function Cart() {
       {showCheckout && (
         <Checkout
           items={items}
-          accountBalance={ACCOUNT_BALANCE}
           onClose={() => setShowCheckout(false)}
           onConfirm={handleOrderConfirmed}
         />
