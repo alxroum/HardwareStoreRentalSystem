@@ -1,69 +1,122 @@
-/* CSS Styling for Login page. */
-
-body {
+.login-page {
+    display: flex;
+    align-items: center;
     justify-content: center;
-    background-color: blue;
-    
+    min-height: calc(100vh - 60px);
+    background: #f0f0f0;
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+.login-card-accent {
+    height: 5px;
+    background: #FFA500;
+}
+
+.login-card-body {
+    padding: 36px 32px 32px;
+}
+
+.login-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 4px 0;
+}
+
+.login-subtitle {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin: 0 0 28px 0;
+}
+
+.login-field {
+    margin-bottom: 18px;
 }
 
 .login-label {
-    justify-content: center;
-    background-color: lightgray;
-    width:180px;
-    margin: 0 auto;
-    border: 10px solid white;
-    border-radius: 20px;
-}
-/*
-.nav-left {
-    width:500px;
-}
-*/
-
-#username-input > input, #password-input > input {
-    background-color: white;
-    border: 1px solid black;
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #888;
+    margin-bottom: 6px;
+    background: none;
+    border: none;
+    width: auto;
+    padding: 0;
+    border-radius: 0;
 }
 
-#login-input { 
-    margin: 0 auto;
-    padding: 2em;
-    background-color: white;
-    border-radius: 1em;
-    box-shadow: 3px 3px rgb(218, 218, 218);
-    color: black;
-    width: 300px;
-    height: 150px;
+.login-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    border: 2px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #333;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-#register-account {
-    justify-content: center;
-    background-color: lightgray;
-    width:300px;
-    margin: 0 auto;
-    border-radius: 20px;
+.login-input:focus {
+    border-color: #FFA500;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
 }
 
-#login-button { /* Resets to default styling for login button. */
-    all: unset;
+.login-input::placeholder {
+    color: #c5c5c5;
 }
 
-/* Hard-Coded Styling (To fix client-side light/dark mode issues): */
-
-#username-input > input, #password-input > input{
-    background-color: white;
-    border: 1px solid black;
-    color: black;
+.login-btn {
+    width: 100%;
+    padding: 13px;
+    background: #FFA500;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 
-#login-h1 {
-    color:black;
+.login-btn:hover {
+    background: #e89500;
+    box-shadow: 0 3px 12px rgba(255, 165, 0, 0.25);
 }
 
-#sign-up-text {
-    color: black;
+.login-btn:active {
+    background: #d48800;
 }
 
-#sign-up-link {
-    font-weight: bold;
+/* ── Footer ── */
+.login-footer {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.88rem;
+    margin-top: 22px;
+}
+
+.login-footer-link {
+    color: #FFA500;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-footer-link:hover {
+    text-decoration: underline;
 }

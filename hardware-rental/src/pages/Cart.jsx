@@ -3,45 +3,29 @@ import './Cart.css';
 import { Checkout } from './Checkout';
 
 export function Cart() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Load cart from localStorage on first render
+  const [items, setItems] = useState(() => {
+    return JSON.parse(localStorage.getItem("CART") || "[]");
+  });
   const [showCheckout, setShowCheckout] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [accountBalance, setAccountBalance] = useState(0);
 
+  // Sync cart back to localStorage whenever items change
   useEffect(() => {
-    // Get current user from localStorage
-    const userJSON = localStorage.getItem("USER");
-    if (userJSON) {
-      try {
-        const user = JSON.parse(userJSON);
-        setCurrentUser(user);
-        setAccountBalance(parseFloat(user.account_balance) || 0);
-      } catch (err) {
-        console.error("Error parsing user data:", err);
-        setError("Session error: could not load user data");
-        setLoading(false);
-        return;
-      }
+    localStorage.setItem("CART", JSON.stringify(items));
+  }, [items]);
+
+  const getRate = (item) => {
+    const days = parseInt(item.duration);
+    // swap to weekly rate if dur is > 7d
+    if (days >= 7) {
+      const weeks = Math.floor(days / 7);
+      const extraDays = days % 7;
+      return (item.weeklyRate * weeks) + (item.dailyRate * extraDays);
     }
-
-    // Load cart items from localStorage
-    const cartJSON = localStorage.getItem("CART");
-    if (cartJSON) {
-      try {
-        const cartItems = JSON.parse(cartJSON);
-        setItems(cartItems);
-      } catch (err) {
-        console.error("Error parsing cart data:", err);
-        setItems([]);
-      }
-    }
-
-    setLoading(false);
-  }, []);
-
-  const getRate = (item) => item.dailyRate * parseInt(item.duration);
+    return item.dailyRate * days;
+  };
 
   const subtotal = items.reduce((sum, i) => sum + getRate(i) * i.qty, 0);
   const deposit  = items.reduce((sum, i) => sum + i.deposit * i.qty, 0);
@@ -72,27 +56,20 @@ export function Cart() {
     });
   };
 
-  const handleOrderConfirmed = () => {
+  const handleOrderConfirmed = (newBalance) => {
+    // clr cart
     setItems([]);
-    localStorage.removeItem("CART");
-
-    // Reload user balance from localStorage to reflect the updated balance from checkout
-    const userJSON = localStorage.getItem("USER");
-    if (userJSON) {
-      try {
-        const user = JSON.parse(userJSON);
-        setAccountBalance(parseFloat(user.account_balance) || 0);
-      } catch (err) {
-        console.error("Error reloading user balance:", err);
-      }
+    localStorage.setItem("CART", "[]");
+    
+    // update user balance
+    const userData = JSON.parse(localStorage.getItem("USER"));
+    if (userData) {
+      userData.account_balance = "" + newBalance;
+      localStorage.setItem("USER", JSON.stringify(userData));
     }
 
     setShowCheckout(false);
   };
-
-  if (loading) return <div className="cart-page"><p style={{ textAlign: 'center' }}>Loading cart...</p></div>;
-  if (error)   return <div className="cart-page"><p style={{ textAlign: 'center', color: 'red' }}>Error: {error}</p></div>;
-  if (!currentUser) return <div className="cart-page"><p style={{ textAlign: 'center' }}>Please <a href="#/login">log in</a> to view your cart.</p></div>;
 
   return (
     <div className="cart-page">
@@ -101,7 +78,7 @@ export function Cart() {
       {items.length === 0 ? (
         <div className="cart-empty">
           <p>Your cart is empty.</p>
-          <a href="#">← Browse equipment</a>
+          <a href="#/">← Browse equipment</a>
         </div>
       ) : (
         <div className="cart-layout">

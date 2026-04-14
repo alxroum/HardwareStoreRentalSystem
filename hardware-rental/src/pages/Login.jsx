@@ -1,10 +1,5 @@
-/* This file contains the code for the login page. */
-
-/* Imports: */
 import './Login.css'
-import { HashRouter as Router, Routes, Route, Link} from 'react-router-dom'
-import { SignUp } from './SignUp'
-import { Home } from './Home'
+import { Link } from 'react-router-dom'
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -22,88 +17,92 @@ export async function validateLogin(username, password) {
         }
 
         const data = await response.json();
-        
-        // Return the safe user data instead of 'true'
-        return data.user; 
+        return data.user;
 
     } catch (error) {
         console.error("Login error:", error.message);
-        alert(error.message); 
-        return null; // Return null instead of 'false'
+        alert(error.message);
+        return null;
     }
 }
 
-/* Primary Function: */
-export function Login() {
+export function Login({ onLogin }) {
 
-    /* Declares Variables: */
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const returnToHome = useNavigate();
     let hasEmptyInput = true;
 
-    /* Gathers Login Information */
     async function processLogin() {
-
-        /* Checks for empty input fields: */
         checkFields();
 
-        /* Validates field check: */
-        if(hasEmptyInput == false) {
-            /* Backend validation should be performed here. */
-
-            // make sure credentials are correct in the backend
-            
+        if (hasEmptyInput == false) {
             const userData = await validateLogin(username, password);
 
-            if(userData) {
-                localStorage.setItem("LOGGEDIN", true);
+            if (userData) {
+                localStorage.setItem("LOGGEDIN", "true");
                 localStorage.setItem("USER", JSON.stringify(userData));
+                if (onLogin) onLogin();
+                returnToHome("/");
             } else {
-                localStorage.setItem("LOGGEDIN", false);
+                localStorage.setItem("LOGGEDIN", "false");
             }
-            // if they are, grab the userid and set it to local storage
-            
-            // otherwise, throw error
-
-            /* Brings the user back to the home page. */
-            returnToHome("/");
-        }
-        else {
-            console.log("Empty input value is true.");
         }
     }
 
-    /* Checks for empty input fields: */
     function checkFields() {
         hasEmptyInput = false;
-        if(username === "") {
-            console.log("Username field empty.");
+        if (username === "") {
             alert("Username field must be filled out.");
             hasEmptyInput = true;
         }
-        if(password === "") {
-            console.log("Password field empty.");
+        if (password === "") {
             alert("Password field must be filled out.");
             hasEmptyInput = true;
         }
     }
 
-    /* Displays Webpage: */
     return (
-        <div id="root-element">
-            <div id="login-box">
-                <h1 id="login-h1">Login</h1>
-                <div id="login-input">
-                    <p className="login-label" id="username-label">Username:</p>
-                    <div id="username-input"><input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}></input></div>
-                    <p className="login-label" id="password-label">Password:</p>
-                    <div id="password-input"><input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}></input></div>
-                    <div id="login-button"><button id="login-button-actual" onClick={() => processLogin()}>Login</button></div>
+        <div className="login-page">
+            <div className="login-card">
+                {/* Orange accent bar at top of card */}
+                <div className="login-card-accent"></div>
+
+                <div className="login-card-body">
+                    <h2 className="login-title">Sign In</h2>
+                    <p className="login-subtitle">Welcome back to Hardware Rental</p>
+
+                    <div className="login-field">
+                        <label className="login-label">Username</label>
+                        <input
+                            className="login-input"
+                            type="text"
+                            placeholder="Enter your username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="login-field">
+                        <label className="login-label">Password</label>
+                        <input
+                            className="login-input"
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+
+                    <button className="login-btn" onClick={() => processLogin()}>
+                        Sign In
+                    </button>
+
+                    <p className="login-footer">
+                        Don't have an account?{' '}
+                        <Link to="/SignUp" className="login-footer-link">Sign Up</Link>
+                    </p>
                 </div>
-            </div>
-            <div id="register-account">
-                <p id="sign-up-text">Don't have an account? <Link to="/SignUp" id="sign-up-link">Sign Up</Link>!</p> 
             </div>
         </div>
     )

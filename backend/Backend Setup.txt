@@ -20,3 +20,5 @@ run "npm i dotenv"
 run "npm install express"
 
 run "npm install multer"
+
+run "npm install bcrypt"

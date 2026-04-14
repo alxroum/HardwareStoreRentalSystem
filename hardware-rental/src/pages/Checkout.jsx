@@ -5,7 +5,20 @@ export function Checkout({ items, accountBalance = 0, username, onClose, onConfi
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const getRate = (item) => item.dailyRate * parseInt(item.duration);
+  // get user data and bal from localStorage
+  const userData = JSON.parse(localStorage.getItem("USER") || "{}");
+  const accountBalance = parseFloat(userData.account_balance) || 0;
+
+  const getRate = (item) => {
+    const days = parseInt(item.duration);
+    if (days >= 7) {
+      const weeks = Math.floor(days / 7);
+      const extraDays = days % 7;
+      return (item.weeklyRate * weeks) + (item.dailyRate * extraDays);
+    }
+    return item.dailyRate * days;
+  };
+
   const subtotal = items.reduce((s, i) => s + getRate(i) * i.qty, 0);
   const deposit  = items.reduce((s, i) => s + i.deposit * i.qty, 0);
   const delivery = 15;
@@ -13,57 +26,40 @@ export function Checkout({ items, accountBalance = 0, username, onClose, onConfi
   const balanceAfter = accountBalance - total;
   const canPay = accountBalance >= total;
 
+  //  longest duration across all items for the order due date
+  const maxDuration = Math.max(...items.map(i => parseInt(i.duration)));
+
   const handleConfirm = async () => {
     setStatus('processing');
     setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:8080/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:8080/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username,
-          total: total.toFixed(2)
+          username: userData.username,
+          items: items.map(i => ({ id: i.id, qty: i.qty })),
+          totalCost: total,
+          durationDays: maxDuration
         })
       });
 
-      // 1. Check if the response was successful FIRST
+      const data = await response.json();
+
       if (!response.ok) {
-        // If it's a 404, 500, etc., stop here.
-        throw new Error(`Server error: ${response.status} ${response.statusText}`);
-      }
-
-      // 2. Only parse JSON if we know the response was successful
-      let data;
-      try {
-        data = await response.json();
-      } catch (parseErr) {
-        console.error('Failed to parse response:', parseErr);
-        throw new Error('Invalid JSON response from server');
-      }
-
-      // 3. Update localStorage with new balance
-      try {
-        const userJSON = localStorage.getItem('USER');
-        if (userJSON) {
-          const user = JSON.parse(userJSON);
-          user.account_balance = data.newBalance;
-          localStorage.setItem('USER', JSON.stringify(user));
-        }
-      } catch (storageErr) {
-        console.error('Error updating localStorage:', storageErr);
-        // Don't throw here - checkout was successful, just log the error
+        throw new Error(data.error || "Checkout failed");
       }
 
       setStatus('success');
 
-      // 4. Call the success callback to clear cart and close modal
-      if (onConfirm) {
-        onConfirm({ paymentMethod: 'balance', total, orderId: data.orderId });
-      }
+      // pass new bal back to Cart so it can update localStoragee
+      setTimeout(() => {
+        if (onConfirm) onConfirm(data.newBalance);
+      }, 1500);
+
     } catch (err) {
-      console.error('Checkout error:', err);
-      setErrorMessage(err.message || 'Something went wrong');
+      console.error("Checkout error:", err);
       setStatus('error');
     }
   };
@@ -133,7 +129,7 @@ export function Checkout({ items, accountBalance = 0, username, onClose, onConfi
             {!canPay && (
               <div className="co-balance-warning">
                 Balance is ${(total - accountBalance).toFixed(2)} short.{' '}
-                <button className="co-balance-add-link">Add funds →</button>
+                <a href="#/account" className="co-balance-add-link" onClick={onClose}>Add funds →</a>
               </div>
             )}
             {errorMessage && (
